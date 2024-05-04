@@ -2,8 +2,14 @@ import datetime
 
 from django.db import transaction
 
-from common_library import get_client_ip, time_until_end_of_day
-from control.models import IPVisitant, TodayYesterday
+from common_library import (
+    get_client_ip,
+    time_until_end_of_day,
+)
+from control.models import (
+    IPVisitant,
+    TodayYesterday,
+)
 
 
 class VisitorCountMiddleware:
@@ -77,5 +83,3 @@ class VisitorCountMiddleware:
             **today_filter_options
         ).count()
         return today_visitor_count
-
-
