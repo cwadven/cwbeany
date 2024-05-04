@@ -3,7 +3,12 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from board.models import Reply, Rereply, Like
-from common_conts import REPLY_NOTIFICATION, EMAIL_TEMPLATE_MAPPER, REREPLY_NOTIFICATION, LIKE_NOTIFICATION
+from common.consts.common_consts import (
+    EMAIL_TEMPLATE_MAPPER,
+    LIKE_NOTIFICATION,
+    REPLY_NOTIFICATION,
+    REREPLY_NOTIFICATION,
+)
 from notification.models import (
     NotificationController,
     ReplyNotification, RereplyNotification, LikeNotification
