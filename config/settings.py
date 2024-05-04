@@ -53,6 +53,7 @@ PROJECT_APPS = [
     'board',
     'control',
     'chatgpt',
+    'common',
 ]
 
 PROJECT_SETTING_APPS = [
