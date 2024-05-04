@@ -1,4 +1,4 @@
-from config.enums import StrValueLabel
+from common.consts.enums import StrValueLabel
 from django.conf import settings
 
 
