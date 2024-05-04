@@ -93,6 +93,12 @@ class PostAdmin(admin.ModelAdmin):
     def _like_count(self, obj):
         return obj._like_count
 
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        instance = form.instance
+        if instance.def_tag:
+            instance.tag_save()
+
     _comment_count.admin_order_field = '_comment_count'
     _like_count.admin_order_field = '_like_count'
 
