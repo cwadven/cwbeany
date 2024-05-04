@@ -196,9 +196,9 @@
 {% block title %}{{ post.title }}{% endblock %}
 {% block og_title %}{{ post.title }}{% endblock %}
 {% block description %}{{ post.body|striptags|slice:":100" }}{% endblock %}
-{% block current_url %}https://nulls.co.kr{{ request.get_full_path }}{% endblock %}
-{% block img %}{% if post.post_img %}https://nulls.co.kr{{ post.post_img.url }}{% else %}
-    https://nulls.co.kr/static/logo.ico{% endif %}{% endblock %}
+{% block current_url %}https://cwbeany.com{{ request.get_full_path }}{% endblock %}
+{% block img %}{% if post.post_img %}https://cwbeany.com{{ post.post_img.url }}{% else %}
+    https://cwbeany.com/static/logo.ico{% endif %}{% endblock %}
 
 {% block middle_left %}
     <div class="progress-container">

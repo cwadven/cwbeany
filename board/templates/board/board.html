@@ -36,8 +36,8 @@
 {% block title %}{% if board %}{{ board.name }} 게시판{% elif tag_board %}{{tag_board.tag_name}} 태그{% else %}{{ request.GET.search }}{% endif %}{% endblock %}
 {% block og_title %}{% if board %}{{ board.name }} 게시판{% elif tag_board %}{{tag_board.tag_name}} 태그{% else %}{{ request.GET.search }}{% endif %}{% endblock %}
 {% block description %}{% if board %}{{board.info|striptags}}{% elif tag_board %}{{tag_board.tag_name}} 태그{% else %}{{ request.GET.search }}{% endif %}{% endblock %}
-{% block current_url %}https://nulls.co.kr{{ request.get_full_path }}{% endblock %}
-{% block img %}{% if board %}{% if board.board_img %}https://nulls.co.kr{{ board.board_img.url }}{% else %}https://nulls.co.kr/static/logo.ico{% endif %}{% else %}{{ request.GET.search }}{% endif %}{% endblock %}
+{% block current_url %}https://cwbeany.com{{ request.get_full_path }}{% endblock %}
+{% block img %}{% if board %}{% if board.board_img %}https://cwbeany.com{{ board.board_img.url }}{% else %}https://cwbeany.com/static/logo.ico{% endif %}{% else %}{{ request.GET.search }}{% endif %}{% endblock %}
 
 {% block top %}
 <!-- 게시판 소개 및 이미지 -->

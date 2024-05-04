@@ -1,14 +1,14 @@
-# NULL TECH BLOG
+# Beany TECH BLOG
 
 <br>
 
 ## Service Address
 
-[edit . 2021-10-19]
+[edit . 2024-05-04]
 
-https://nulls.co.kr
+https://cwbeany.com
 
-<img alt="logo.png" src="https://github.com/cwadven/NULL_BLOG_2021/blob/master/github_project_info_images/null_blog_logo.png?raw=true" style="width=100%; max-width=500px" />
+<img alt="logo.png" src="https://github.com/cwadven/cwbeany/blob/master/github_project_info_images/null_blog_logo.png?raw=true" style="width=100%; max-width=500px" />
 
 <br>
 
@@ -137,6 +137,6 @@ Project Root
 
 ## Database Structure
 
-[edit . 2022-03-19]
+[edit . 2024-05-04]
 
-![img.png](https://github.com/cwadven/NULL_BLOG_2021/blob/master/github_project_info_images/null_blog_database_picture.png?raw=true)
+![img.png](https://github.com/cwadven/cwbeany/blob/master/github_project_info_images/null_blog_database_picture.png?raw=true)

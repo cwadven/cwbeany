@@ -30,11 +30,11 @@ def reply_post(sender, instance, *args, **kwargs):
         if instance.post.author.email:
             send_email_async_notification.apply_async(
                 (
-                    f'[Nulls 블로그] {instance.post.title[:20]} 게시글에 댓글이 달렸습니다.',
+                    f'[Beany 블로그] {instance.post.title[:20]} 게시글에 댓글이 달렸습니다.',
                     EMAIL_TEMPLATE_MAPPER[REPLY_NOTIFICATION],
                     {
                         'post_title': f'{instance.post.title} 에 댓글이 달렸습니다.',
-                        'post_url': 'https://nulls.co.kr' + instance.post.get_absolute_url() + '#reply_' + str(instance.id),
+                        'post_url': 'https://cwbeany.com' + instance.post.get_absolute_url() + '#reply_' + str(instance.id),
                         'reply_nickname': instance.author.nickname,
                         'reply_body': instance.body,
                     },
@@ -62,11 +62,11 @@ def rereply_post(sender, instance, *args, **kwargs):
         if instance.reply.author.email:
             send_email_async_notification.apply_async(
                 (
-                    f'[Nulls 블로그] 댓글에 대댓글이 달렸습니다.',
+                    f'[Beany 블로그] 댓글에 대댓글이 달렸습니다.',
                     EMAIL_TEMPLATE_MAPPER[REREPLY_NOTIFICATION],
                     {
                         'information': f'{instance.reply.author.nickname} 님의 댓글에 대댓글이 달렸습니다.',
-                        'post_url': 'https://nulls.co.kr' + instance.post.get_absolute_url() + '#rereply_' + str(instance.id),
+                        'post_url': 'https://cwbeany.com' + instance.post.get_absolute_url() + '#rereply_' + str(instance.id),
                         'rereply_nickname': instance.author.nickname,
                         'rereply_body': instance.body,
                     },
@@ -94,11 +94,11 @@ def like_post(sender, instance, *args, **kwargs):
         if instance.post.author.email:
             send_email_async_notification.apply_async(
                 (
-                    f'[Nulls 블로그] 게시글에 좋아요가 달렸습니다.',
+                    f'[Beanys 블로그] 게시글에 좋아요가 달렸습니다.',
                     EMAIL_TEMPLATE_MAPPER[LIKE_NOTIFICATION],
                     {
                         'post_title': f'{instance.post.title} 게시글에 좋아요가 달렸습니다.',
-                        'post_url': 'https://nulls.co.kr' + instance.post.get_absolute_url(),
+                        'post_url': 'https://cwbeany.com' + instance.post.get_absolute_url(),
                         'liker_nickname': instance.author.nickname,
                     },
                     [instance.post.author.email]
