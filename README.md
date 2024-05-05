@@ -8,7 +8,7 @@
 
 https://cwbeany.com
 
-<img alt="logo.png" src="https://github.com/cwadven/cwbeany/blob/master/github_project_info_images/null_blog_logo.png?raw=true" style="width=100%; max-width=500px" />
+<img alt="logo.png" src="https://github.com/cwadven/cwbeany/blob/master/docs/logos/main_logo.png?raw=true" style="width=100%; max-width=500px" />
 
 <br>
 
@@ -139,4 +139,4 @@ Project Root
 
 [edit . 2024-05-04]
 
-![img.png](https://github.com/cwadven/cwbeany/blob/master/github_project_info_images/null_blog_database_picture.png?raw=true)
+![img.png](https://github.com/cwadven/cwbeany/blob/master/docs/erd/erd.png?raw=true)
