@@ -10,9 +10,19 @@ from django.http import (
     HttpResponse,
     HttpResponseRedirect,
 )
+from django.urls import reverse
+
+from board.models import (
+    Board,
+    BoardGroup,
+    Like,
+    Post,
+    Reply,
+    Rereply,
+    Tag,
+)
 from chatgpt.models import Lesson
 from common.common_utils.paginator_utils import web_paging
-from .models import *
 from control.models import *
 from django.db.models import (
     Count,
