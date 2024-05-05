@@ -114,13 +114,6 @@ class Post(TimeStampedModel):
         except:
             pass
 
-    def save(self, *args, **kwargs):
-        saved = super(Post, self).save(*args, **kwargs)
-        # TAG 저장
-        if self.def_tag:
-            self.tag_save()
-        return saved
-
 
 # 좋아요
 class Like(TimeStampedModel):
