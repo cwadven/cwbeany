@@ -5,7 +5,6 @@ import re
 from django.urls import reverse
 
 from board.managers import PostManager
-from common_library import transition_special_code
 
 
 class TimeStampedModel(models.Model):
