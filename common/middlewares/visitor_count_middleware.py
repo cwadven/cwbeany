@@ -1,10 +1,9 @@
 import datetime
 
 from django.db import transaction
-
+from common.common_utils.time_utils import time_until_end_of_day
 from common_library import (
     get_client_ip,
-    time_until_end_of_day,
 )
 from control.models import (
     IPVisitant,
