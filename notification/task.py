@@ -1,4 +1,4 @@
-from common_library import send_email
+from common.common_utils.io_utils import send_email
 from config.celery import app
 
 

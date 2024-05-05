@@ -64,24 +64,3 @@ def transition_special_code(special_code: str) -> str:
     }
     special_code = re.sub('<[^<]+?>', '', special_code)
     return SPECIAL_CHAR.get(special_code, special_code)
-
-
-def send_email(title: str, html_body_content: str, payload: dict, to: list) -> None:
-    """
-    title: 메일 제목
-    html_body_content: 적용할 templates 폴더에 있는 html 파일 위치
-    payload: 해당 template_tag 로 쓰일 값들
-    to: 보낼 사람들 (리스트로 전달 필요)
-    """
-    message = render_to_string(
-        html_body_content,
-        payload
-    )
-    send_mail(
-        title,
-        strip_tags(message),
-        settings.EMAIL_HOST_USER,
-        to,
-        html_message=message,
-        fail_silently=False,
-    )
