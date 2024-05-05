@@ -31,16 +31,13 @@ from control.models import Announce
 
 
 def get_board_set_from_board_group(request, board_group_id):
-    try:
-        board_group = BoardGroup.objects.get(
-            id=board_group_id
-        )
-    except BoardGroup.DoesNotExist:
-        raise Http404
-
-    board_set = board_group.board_set.all().values('name', 'url')
-
-    return HttpResponse(json.dumps({'board_set': list(board_set)}), 'application/json')
+    board_info = Board.objects.filter(
+        board_group_id=board_group_id
+    ).values(
+        'name',
+        'url',
+    )
+    return HttpResponse(json.dumps({'board_set': list(board_info)}), 'application/json')
 
 
 def home(request):
