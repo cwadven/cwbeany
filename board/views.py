@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 
 from chatgpt.models import Lesson
-from common_library import web_paging
+from common.common_utils.paginator_utils import web_paging
 from .models import *
 from control.models import *
 from django.db.models import Count, Q
@@ -117,7 +117,12 @@ def board(request, board_url):
             '-created_at'
         )
 
-    paging_obj = web_paging(request, posts, 10, 5)
+    paging_obj = web_paging(
+        posts,
+        int(request.GET.get('page', 1)),
+        10,
+        5,
+    )
 
     context = {
         'posts': paging_obj.get('page_posts'),
