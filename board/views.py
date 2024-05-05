@@ -1,6 +1,10 @@
 import json
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import (
+    Count,
+    Q,
+)
 from django.shortcuts import (
     get_object_or_404,
     render,
@@ -23,11 +27,7 @@ from board.models import (
 )
 from chatgpt.models import Lesson
 from common.common_utils.paginator_utils import web_paging
-from control.models import *
-from django.db.models import (
-    Count,
-    Q,
-)
+from control.models import Announce
 
 
 def get_board_set_from_board_group(request, board_group_id):
