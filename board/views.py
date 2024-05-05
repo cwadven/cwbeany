@@ -1,5 +1,3 @@
-import json
-
 from django.contrib.auth.decorators import login_required
 from django.db.models import (
     Count,
@@ -10,34 +8,41 @@ from django.shortcuts import (
     render,
 )
 from django.http import (
-    Http404,
     HttpResponse,
     HttpResponseRedirect,
 )
 from django.urls import reverse
 
+from board.dtos.response_dtos import (
+    BoardSetBoardInfo,
+    BoardSetGroupResponse,
+)
 from board.models import (
     Board,
-    BoardGroup,
     Like,
     Post,
     Reply,
     Rereply,
     Tag,
 )
+from board.services import get_boards_by_board_group_id
 from chatgpt.models import Lesson
 from common.common_utils.paginator_utils import web_paging
 from control.models import Announce
 
 
-def get_board_set_from_board_group(request, board_group_id):
-    board_info = Board.objects.filter(
-        board_group_id=board_group_id
-    ).values(
-        'name',
-        'url',
+def get_boards_info_from_board_group(request, board_group_id: int):
+    return HttpResponse(
+        BoardSetGroupResponse(
+            board_set=[
+                BoardSetBoardInfo(
+                    name=_board.name,
+                    url=_board.url
+                ) for _board in get_boards_by_board_group_id(board_group_id)
+            ]
+        ).model_dump_json(),
+        'application/json',
     )
-    return HttpResponse(json.dumps({'board_set': list(board_info)}), 'application/json')
 
 
 def home(request):
