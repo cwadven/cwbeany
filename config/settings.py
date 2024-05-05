@@ -166,7 +166,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'board.context_processors.nav_board',
-                'config.custom_context_processors.visitor_info',
+                'control.context_processors.visitor_info',
             ],
         },
     },
