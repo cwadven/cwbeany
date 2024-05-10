@@ -31,6 +31,7 @@ from board.services import (
     get_tags,
 )
 from chatgpt.models import Lesson
+from chatgpt.services import get_lessons
 from common.common_utils.paginator_utils import web_paging
 from control.models import Announce
 from control.services import get_announces
@@ -63,8 +64,6 @@ def home(request):
         '-reply_count',
         '-id',
     )[:6]
-    lesson = Lesson.objects.last()
-
     context = {
         'recent_post_set': recent_post_qs,
         'liked_ordered_post_set': liked_ordered_post_qs,
@@ -72,9 +71,8 @@ def home(request):
         'announce_set': get_announces().order_by(
             '-id'
         )[:5],
-        'lesson': lesson,
+        'lesson': get_lessons().last(),
     }
-
     return render(request, 'board/home.html', context)
 
 
