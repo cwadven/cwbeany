@@ -1,8 +1,11 @@
 import requests
 from typing import List
 
+from django.db.models import QuerySet
+
 from chatgpt.consts import CHATGPT_URL, CHATGPT_HEADERS
 from chatgpt.dtos import ChatGPTConversationEntry
+from chatgpt.models import Lesson
 
 
 def get_chatgpt_response(system_prompt: str, prompt: str,
@@ -31,3 +34,7 @@ def get_chatgpt_response(system_prompt: str, prompt: str,
         return generated_text.strip()
     else:
         return ''
+
+
+def get_lessons() -> QuerySet[Lesson]:
+    return Lesson.objects.all()
