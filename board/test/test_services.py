@@ -5,10 +5,11 @@ from board.models import (
     Board,
     BoardGroup,
     Post,
+    Tag,
 )
 from board.services import (
     get_active_posts,
-    get_boards_by_board_group_id,
+    get_boards_by_board_group_id, get_tags,
 )
 
 
@@ -95,3 +96,24 @@ class GetActivePostsTestCase(TestCase):
         self.assertEqual(active_posts.count(), 1)
         # And: Active post is returned
         self.assertEqual(active_posts.first().id, self.active_post.id)
+
+
+class GetTagsTestCase(TestCase):
+    def setUp(self):
+        # Setting up data for the tests
+        self.tag_django = Tag.objects.create(tag_name="Django")
+        self.tag_python = Tag.objects.create(tag_name="Python")
+        self.tag_api = Tag.objects.create(tag_name="API")
+
+    def test_get_tags(self):
+        # Given:
+        # When:
+        all_tags = get_tags()
+
+        # Then: All tags are returned
+        self.assertEqual(all_tags.count(), 3)
+        # And: Specific tags are returned
+        self.assertEqual(
+            set(all_tags.values_list('tag_name', flat=True)),
+            {'Django', 'Python', 'API'}
+        )
