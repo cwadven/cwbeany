@@ -18,7 +18,7 @@ class BoardSetBoardInfo(BaseModel):
     url: str = Field(...)
 
 
-class BoardHomeResponse(BaseModel):
+class HomeResponse(BaseModel):
     recent_post_set: QuerySet = Field(...)
     liked_ordered_post_set: QuerySet = Field(...)
     tag_infos: List[TagInfo] = Field(
