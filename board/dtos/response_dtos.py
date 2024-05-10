@@ -19,11 +19,11 @@ class BoardSetBoardInfo(BaseModel):
 
 
 class HomeResponse(BaseModel):
-    recent_post_set: QuerySet = Field(...)
-    liked_ordered_post_set: QuerySet = Field(...)
+    recent_post_set: Field(...)
+    liked_ordered_post_set: Field(...)
     tag_infos: List[TagInfo] = Field(
         default_factory=list,
         description='태그 이름과 각 태그의 게시물 수 목록',
     )
-    announce_set: QuerySet = Field(...)
-    lesson: QuerySet = Field(...)
+    announce_set: Field(...)
+    lesson: Field(...)
