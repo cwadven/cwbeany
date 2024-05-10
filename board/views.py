@@ -25,7 +25,7 @@ from board.models import (
     Rereply,
     Tag,
 )
-from board.services import get_boards_by_board_group_id
+from board.services import get_boards_by_board_group_id, get_active_posts
 from chatgpt.models import Lesson
 from common.common_utils.paginator_utils import web_paging
 from control.models import Announce
@@ -46,11 +46,11 @@ def get_boards_info_from_board_group(request, board_group_id: int):
 
 
 def home(request):
-    recent_post_set = Post.objects.active().order_by(
+    post_qs = get_active_posts()
+    recent_post_qs = post_qs.order_by(
         '-id'
     )[:6]
-
-    liked_ordered_post_set = Post.objects.active().annotate(
+    liked_ordered_post_qs = post_qs.annotate(
         reply_count=Count('replys', distinct=True) + Count('rereply', distinct=True),
         like_count=Count('likes', distinct=True),
     ).order_by(
@@ -68,8 +68,8 @@ def home(request):
     lesson = Lesson.objects.last()
 
     context = {
-        'recent_post_set': recent_post_set,
-        'liked_ordered_post_set': liked_ordered_post_set,
+        'recent_post_set': recent_post_qs,
+        'liked_ordered_post_set': liked_ordered_post_qs,
         'tag_set': tag_set,
         'announce_set': announce_set,
         'lesson': lesson,
