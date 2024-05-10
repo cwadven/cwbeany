@@ -1,7 +1,15 @@
 from django.test import TestCase
 
-from board.models import BoardGroup, Board
-from board.services import get_boards_by_board_group_id
+from accounts.models import User
+from board.models import (
+    Board,
+    BoardGroup,
+    Post,
+)
+from board.services import (
+    get_active_posts,
+    get_boards_by_board_group_id,
+)
 
 
 class GetBoardsByBoardGroupIdTestCase(TestCase):
@@ -52,3 +60,38 @@ class GetBoardsByBoardGroupIdTestCase(TestCase):
 
         # Then: No boards are returned
         self.assertEqual(boards, [])
+
+
+class GetActivePostsTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='test_user',
+            password='test_password',
+        )
+        self.board = Board.objects.create(
+            url='test_board',
+            name='test_board',
+        )
+        self.active_post = Post.objects.create(
+            title="Active Post",
+            board=self.board,
+            is_active=True,
+            author=self.user,
+        )
+        self.inactive_post = Post.objects.create(
+            title="Inactive Post",
+            board=self.board,
+            is_active=False,
+            author=self.user,
+        )
+
+    def test_get_active_posts(self):
+        # Given:
+        # When: Get active posts
+        active_posts = get_active_posts()
+
+        # Then: Active posts are returned
+        # And: Only active posts are returned
+        self.assertEqual(active_posts.count(), 1)
+        # And: Active post is returned
+        self.assertEqual(active_posts.first().id, self.active_post.id)
