@@ -13,6 +13,7 @@ from django.http import (
 )
 from django.urls import reverse
 
+from board.consts import BOARD_HOME_PATH
 from board.dtos.response_dtos import (
     BoardSetBoardInfo,
     BoardSetGroupResponse,
@@ -66,7 +67,7 @@ def home(request):
     )[:6]
     return render(
         request,
-        'board/home.html',
+        BOARD_HOME_PATH,
         {
             'recent_post_set': recent_post_qs,
             'liked_ordered_post_set': liked_ordered_post_qs,
