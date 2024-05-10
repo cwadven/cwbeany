@@ -9,7 +9,9 @@ from board.models import (
 )
 from board.services import (
     get_active_posts,
-    get_boards_by_board_group_id, get_tags,
+    get_boards_by_board_group_id,
+    get_tags,
+    get_tags_active_post_count,
 )
 
 
@@ -101,9 +103,9 @@ class GetActivePostsTestCase(TestCase):
 class GetTagsTestCase(TestCase):
     def setUp(self):
         # Setting up data for the tests
-        self.tag_django = Tag.objects.create(tag_name="Django")
-        self.tag_python = Tag.objects.create(tag_name="Python")
-        self.tag_api = Tag.objects.create(tag_name="API")
+        self.tag_django = Tag.objects.create(tag_name='Django')
+        self.tag_python = Tag.objects.create(tag_name='Python')
+        self.tag_api = Tag.objects.create(tag_name='API')
 
     def test_get_tags(self):
         # Given:
@@ -117,3 +119,78 @@ class GetTagsTestCase(TestCase):
             set(all_tags.values_list('tag_name', flat=True)),
             {'Django', 'Python', 'API'}
         )
+
+
+class TagPostCountTestCase(TestCase):
+    def setUp(self):
+        # Given: User
+        self.user = User.objects.create_user(
+            username='test_user',
+            password='test_password',
+        )
+        # And: Board
+        self.board = Board.objects.create(
+            url='test_board',
+            name='test_board',
+        )
+        # And: Tags
+        self.tag_django = Tag.objects.create(tag_name='Django')
+        self.tag_python = Tag.objects.create(tag_name='Python')
+        self.tag_api = Tag.objects.create(tag_name='API')
+        # And: Create Posts with Tags
+        self.active_post_with_tag_django_python = Post.objects.create(
+            title='Active Post',
+            board=self.board,
+            is_active=True,
+            author=self.user,
+        )
+        self.active_post_with_tag_django_python.tag_set.add(
+            self.tag_django,
+            self.tag_python,
+        )
+        self.active_post_with_tag_django_api = Post.objects.create(
+            title='Active Post',
+            board=self.board,
+            is_active=True,
+            author=self.user,
+        )
+        self.active_post_with_tag_django_api.tag_set.add(
+            self.tag_django,
+            self.tag_api,
+        )
+        self.inactive_post_with_tag_django_python_api = Post.objects.create(
+            title="Inactive Post",
+            board=self.board,
+            is_active=False,
+            author=self.user,
+        )
+        self.inactive_post_with_tag_django_python_api.tag_set.add(
+            self.tag_django,
+            self.tag_python,
+            self.tag_api,
+        )
+
+    def test_active_post_counts(self):
+        # Given: Tag IDs
+        tag_ids = [self.tag_django.id, self.tag_python.id, self.tag_api.id]
+
+        # When: Get tags active post count
+        active_posts_count = get_tags_active_post_count(tag_ids)
+
+        # Then: Active post counts are returned (inactive_post_with_tag_django_python_api not seen)
+        # And: active_post_with_tag_django_python, active_post_with_tag_django_api ==> 2
+        self.assertEqual(active_posts_count[self.tag_django.id], 2)
+        # And: active_post_with_tag_django_python ==> 1
+        self.assertEqual(active_posts_count[self.tag_python.id], 1)
+        # And: active_post_with_tag_django_api ==> 1
+        self.assertEqual(active_posts_count[self.tag_api.id], 1)
+
+    def test_empty_tag_ids(self):
+        # Given: Empty tag ids
+        tag_ids = []
+
+        # When: Get tags active post count
+        active_posts_count = get_tags_active_post_count(tag_ids)
+
+        # Then: Empty dictionary
+        self.assertEqual(active_posts_count, {})
