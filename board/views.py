@@ -64,16 +64,19 @@ def home(request):
         '-reply_count',
         '-id',
     )[:6]
-    context = {
-        'recent_post_set': recent_post_qs,
-        'liked_ordered_post_set': liked_ordered_post_qs,
-        'tag_set': get_tags(),
-        'announce_set': get_announces().order_by(
-            '-id'
-        )[:5],
-        'lesson': get_lessons().last(),
-    }
-    return render(request, 'board/home.html', context)
+    return render(
+        request,
+        'board/home.html',
+        {
+            'recent_post_set': recent_post_qs,
+            'liked_ordered_post_set': liked_ordered_post_qs,
+            'tag_set': get_tags(),
+            'announce_set': get_announces().order_by(
+                '-id'
+            )[:5],
+            'lesson': get_lessons().last(),
+        }
+    )
 
 
 # 게시글 목록 (게시판)
