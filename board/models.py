@@ -92,12 +92,13 @@ class Post(TimeStampedModel):
 
     def short_body(self):
         SPECIAL_CHAR = {
-            "&gt;": ">",
-            "&nbsp;": " ",
-            "&lt;": "<",
-            "&amp;": "&",
-            "&quot;": '"',
-            "&minus;": "-",
+            '&gt;': '>',
+            '&nbsp;': ' ',
+            '&lt;': '<',
+            '&amp;': '&',
+            '&quot;': '"',
+            '&#39;': "'",
+            '&minus;': '-',
         }
         split_body_list = self.body.split()[:50]
         result_string = " ".join(split_body_list)
