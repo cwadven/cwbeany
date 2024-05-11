@@ -6,6 +6,7 @@ from board.models import (
     BoardGroup,
     Post,
     Reply,
+    Rereply,
     Tag,
 )
 from board.services import (
@@ -14,6 +15,7 @@ from board.services import (
     get_tags,
     get_tags_active_post_count,
     update_post_reply_count,
+    update_post_rereply_count,
 )
 
 
@@ -220,6 +222,16 @@ class PostReplyCountTestCase(TestCase):
         self.reply1 = Reply.objects.create(body='Reply 1', post=self.active_post, author=self.user)
         self.reply2 = Reply.objects.create(body='Reply 2', post=self.active_post, author=self.user)
 
+    def test_update_post_reply_count_post_not_exists(self):
+        # Given: Post not exists
+        post_id = 0
+
+        # When: Update post Reply count
+        update_post_reply_count(post_id)
+
+        # Then:
+        # Noting happens
+
     def test_update_post_reply_count(self):
         # Given: Test before update
         self.assertEqual(self.active_post.reply_count, 0)
@@ -249,3 +261,77 @@ class PostReplyCountTestCase(TestCase):
         no_reply_post.refresh_from_db()
         # And: Reply count is updated
         self.assertEqual(no_reply_post.reply_count, 0)
+
+
+class PostRereplyCountTestCase(TestCase):
+    def setUp(self):
+        # Given: User
+        self.user = User.objects.create_user(
+            username='test_user',
+            password='test_password',
+        )
+        # And: Board
+        self.board = Board.objects.create(
+            url='test_board',
+            name='test_board',
+        )
+        # And: Create Posts with Tags
+        self.active_post = Post.objects.create(
+            title='Active Post',
+            board=self.board,
+            is_active=True,
+            author=self.user,
+        )
+        self.reply1 = Reply.objects.create(body='Reply 1', post=self.active_post, author=self.user)
+        self.reply1_rereply1 = Rereply.objects.create(
+            post=self.active_post,
+            reply=self.reply1,
+            body='Rereply 1',
+            author=self.user,
+        )
+        self.reply1_rereply2 = Rereply.objects.create(
+            post=self.active_post,
+            reply=self.reply1,
+            body='Rereply 2',
+            author=self.user,
+        )
+
+    def test_update_post_rereply_count_post_not_exists(self):
+        # Given: Post not exists
+        post_id = 0
+
+        # When: Update post Rereply count
+        update_post_rereply_count(post_id)
+
+        # Then:
+        # Noting happens
+
+    def test_update_post_rereply_count(self):
+        # Given: Test before update
+        self.assertEqual(self.active_post.rereply_count, 0)
+
+        # When: Update post Rereply count
+        update_post_rereply_count(self.active_post.id)
+
+        # Then: Post is updated
+        self.active_post.refresh_from_db()
+        # And: Rereply count is updated
+        self.assertEqual(self.active_post.rereply_count, 2)
+
+    def test_update_with_no_rereplies(self):
+        # Given: Test before update
+        no_reply_post = Post.objects.create(
+            title='Active Post',
+            board=self.board,
+            is_active=True,
+            author=self.user,
+        )
+        self.assertEqual(no_reply_post.rereply_count, 0)
+
+        # When: Update post Rereply count
+        update_post_rereply_count(no_reply_post.id)
+
+        # Then: Post is updated
+        no_reply_post.refresh_from_db()
+        # And: Rereply count is updated
+        self.assertEqual(no_reply_post.rereply_count, 0)
