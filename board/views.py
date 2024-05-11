@@ -59,11 +59,22 @@ def get_boards_info_from_board_group(request, board_group_id: int):
 
 
 def home(request):
-    post_qs = get_active_posts()
-    recent_post_qs = post_qs.order_by(
+    recent_post_qs = get_active_posts().select_related(
+        'board',
+    ).order_by(
         '-id'
+    ).only(
+        'id',
+        'board__url',
+        'title',
+        'body',
+        'post_img',
+        'created_at',
     )[:6]
-    liked_ordered_post_qs = post_qs.annotate(
+    liked_ordered_post_qs = get_active_posts().select_related(
+        'board',
+        'author',
+    ).annotate(
         reply_count=Count('replys', distinct=True) + Count('rereply', distinct=True),
         like_count=Count('likes', distinct=True),
     ).order_by(
