@@ -120,7 +120,7 @@
             {{post.body|safe}}
         </div>
         <div class="text-secondary mb-2">
-            <i class="bi bi-person-circle"></i> {{post.author.nickname}} <i class="bi bi-calendar-week"></i> {{post.created_at|date:'Y-m-d'}}
+            <i class="bi bi-person-circle"></i> {{post.author_nickname}} <i class="bi bi-calendar-week"></i> {{post.created_at}}
         </div>
         <div>
             <i class="bi bi-heart text-danger"></i></i> {{post.like_count}} <i class="bi bi-chat-right-text"></i> {{post.reply_count}}
