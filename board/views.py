@@ -35,7 +35,11 @@ from board.models import (
 from board.services import (
     get_active_posts,
     get_boards_by_board_group_id,
-    get_tags, get_tags_active_post_count,
+    get_tags,
+    get_tags_active_post_count,
+    update_post_like_count,
+    update_post_reply_count,
+    update_post_rereply_count,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
 from chatgpt.services import get_lessons
@@ -254,6 +258,7 @@ def reply_write(request, board_url, pk):
         post = get_object_or_404(Post, board__url=board_url, pk=pk)
         if request.POST.get('reply_body'):
             Reply.objects.create(post=post, author=request.user, body=request.POST.get('reply_body'))
+            update_post_reply_count(pk)
 
     return HttpResponseRedirect(reverse('board:post', args=[board_url, pk]))
 
@@ -268,6 +273,7 @@ def rereply_write(request, board_url, pk):
         rereply.author = request.user
         rereply.body = request.POST.get('rereply')
         rereply.save()
+        update_post_rereply_count(pk)
     return HttpResponseRedirect(reverse('board:post', args=[board_url, reply.post.id]))
 
 
@@ -278,6 +284,7 @@ def reply_delete(request, board_url, pk):
     post_id = reply.post.id
     if reply.author == request.user or request.user.is_superuser:
         reply.delete()
+        update_post_reply_count(post_id)
     return HttpResponseRedirect(reverse('board:post', args=[board_url, post_id]))
 
 
@@ -288,6 +295,7 @@ def rereply_delete(request, board_url, pk):
     post_id = rereply.post.id
     if rereply.author == request.user or request.user.is_superuser:
         rereply.delete()
+        update_post_rereply_count(post_id)
     return HttpResponseRedirect(reverse('board:post', args=[board_url, post_id]))
 
 
@@ -300,4 +308,5 @@ def like(request, board_url, pk):
         qs.delete()
     else:
         Like.objects.create(author=request.user, post=post)
+    update_post_like_count(pk)
     return HttpResponseRedirect(reverse('board:post', args=[board_url, pk]))
