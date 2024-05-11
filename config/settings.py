@@ -45,6 +45,7 @@ THIRD_APPS = [
     'ckeditor_uploader',
     'django_crontab',
     'django_celery_results',
+    'debug_toolbar',
 ]
 
 PROJECT_APPS = [
@@ -150,6 +151,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'common.middlewares.visitor_count_middleware.VisitorCountMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -304,3 +306,7 @@ CACHES = {
 }
 
 CHATGPT_KEY = CHATGPT_KEY
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
