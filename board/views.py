@@ -123,8 +123,8 @@ def home(request):
                 AnnounceInfo(
                     title=announce.title,
                     body=announce.body,
-                    created_at=announce.created_at,
-                ) for announce in get_announces().order_by('-id')[:5].values()
+                    created_at=announce.created_at.strftime('%Y-%m-%d'),
+                ) for announce in get_announces().order_by('-id')[:5]
             ],
             lesson=HomeLesson(
                 summary=lesson.summary,
