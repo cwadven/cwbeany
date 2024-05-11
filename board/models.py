@@ -69,6 +69,9 @@ class Post(TimeStampedModel):
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='posts', on_delete=models.CASCADE)
     tag_set = models.ManyToManyField('Tag', blank=True)
+    like_count = models.BigIntegerField(default=0, db_index=True)
+    reply_count = models.BigIntegerField(default=0, db_index=True)
+    rereply_count = models.BigIntegerField(default=0, db_index=True)
     is_active = models.BooleanField(default=True)
 
     objects = PostManager()
