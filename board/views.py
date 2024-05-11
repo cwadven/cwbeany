@@ -78,13 +78,20 @@ def home(request):
     liked_ordered_post_qs = get_active_posts().select_related(
         'board',
         'author',
-    ).annotate(
-        reply_count=Count('replys', distinct=True) + Count('rereply', distinct=True),
-        like_count=Count('likes', distinct=True),
     ).order_by(
         '-like_count',
         '-reply_count',
         '-id',
+    ).only(
+        'id',
+        'board__url',
+        'author__nickname',
+        'title',
+        'body',
+        'created_at',
+        'like_count',
+        'reply_count',
+        'rereply_count',
     )[:6]
     tags = get_tags()
     post_count_by_tag_id = get_tags_active_post_count([tag.id for tag in tags])
@@ -111,7 +118,7 @@ def home(request):
                     title=liked_ordered_post.title,
                     body=liked_ordered_post.body,
                     like_count=liked_ordered_post.like_count,
-                    reply_count=liked_ordered_post.reply_count,
+                    reply_count=liked_ordered_post.reply_count + liked_ordered_post.rereply_count,
                     author_nickname=liked_ordered_post.author.nickname,
                     created_at=liked_ordered_post.created_at.strftime('%Y-%m-%d'),
                 )
@@ -174,27 +181,18 @@ def board(request, board_url):
     # 게시판 선택
     if page == 1:
         board_obj = get_object_or_404(Board, url=board_url)
-        posts = board_obj.post_set.filter(q).annotate(
-            reply_count=Count('replys', distinct=True) + Count('rereply', distinct=True),
-            like_count=Count('likes', distinct=True),
-        ).order_by(
+        posts = board_obj.post_set.filter(q).order_by(
             '-created_at'
         )
     # 태그 검색
     elif page == 2:
         tag_board = get_object_or_404(Tag, tag_name=tag_option)
-        posts = tag_board.post_set.filter(q).annotate(
-            reply_count=Count('replys', distinct=True) + Count('rereply', distinct=True),
-            like_count=Count('likes', distinct=True),
-        ).order_by(
+        posts = tag_board.post_set.filter(q).order_by(
             '-created_at'
         )
     # 전체 검색
     elif page == 3:
-        posts = Post.objects.active().filter(q).annotate(
-            reply_count=Count('replys', distinct=True) + Count('rereply', distinct=True),
-            like_count=Count('likes', distinct=True),
-        ).order_by(
+        posts = Post.objects.active().filter(q).order_by(
             '-created_at'
         )
 
@@ -227,11 +225,6 @@ def post_detail(request, board_url, pk):
 
     prev_post = qs.filter(id__lt=pk).first()
     next_post = qs.filter(id__gt=pk).order_by('id').first()
-
-    qs = qs.annotate(
-        reply_count=Count('replys', distinct=True) + Count('rereply', distinct=True),
-        like_count=Count('likes', distinct=True),
-    )
 
     post = get_object_or_404(qs, board__url=board_url, pk=pk)
 
