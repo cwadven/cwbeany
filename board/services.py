@@ -10,7 +10,7 @@ from django.db.models import (
 from board.models import (
     Board,
     Post,
-    Tag,
+    Tag, Reply,
 )
 
 
@@ -48,5 +48,5 @@ def get_tags_active_post_count(tag_ids: List[int]) -> Dict[int, int]:
 
 def update_post_reply_count(post_id: int) -> None:
     post = Post.objects.get(id=post_id)
-    post.reply_count = post.replys.count()
+    post.reply_count = Reply.objects.filter(post_id=post_id).count()
     post.save(update_fields=('reply_count',))
