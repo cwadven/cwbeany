@@ -5,13 +5,15 @@ from board.models import (
     Board,
     BoardGroup,
     Post,
-    Tag, Reply,
+    Reply,
+    Tag,
 )
 from board.services import (
     get_active_posts,
     get_boards_by_board_group_id,
     get_tags,
-    get_tags_active_post_count, update_post_reply_count,
+    get_tags_active_post_count,
+    update_post_reply_count,
 )
 
 
