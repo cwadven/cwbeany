@@ -12,9 +12,15 @@ from django.http import (
     HttpResponseRedirect,
 )
 from django.urls import reverse
+from django.templatetags.static import static
 
 from board.consts import BOARD_HOME_PATH
+from board.dtos.common_dtos import (
+    HomePost,
+    TagInfo,
+)
 from board.dtos.response_dtos import (
+    HomeResponse,
     BoardSetBoardInfo,
     BoardSetGroupResponse,
 )
@@ -29,12 +35,12 @@ from board.models import (
 from board.services import (
     get_active_posts,
     get_boards_by_board_group_id,
-    get_tags,
+    get_tags, get_tags_active_post_count,
 )
-from chatgpt.models import Lesson
+from chatgpt.dtos.common_dtos import HomeLesson
 from chatgpt.services import get_lessons
 from common.common_utils.paginator_utils import web_paging
-from control.models import Announce
+from control.dtos.common_dtos import AnnounceInfo
 from control.services import get_announces
 
 
@@ -65,18 +71,55 @@ def home(request):
         '-reply_count',
         '-id',
     )[:6]
+    tags = get_tags()
+    post_count_by_tag_id = get_tags_active_post_count([tag.id for tag in tags])
+    lesson = get_lessons().last()
     return render(
         request,
         BOARD_HOME_PATH,
-        {
-            'recent_post_set': recent_post_qs,
-            'liked_ordered_post_set': liked_ordered_post_qs,
-            'tag_set': get_tags(),
-            'announce_set': get_announces().order_by(
-                '-id'
-            )[:5],
-            'lesson': get_lessons().last(),
-        }
+        HomeResponse(
+            recent_posts=[
+                HomePost(
+                    id=recent_post.id,
+                    board_url=recent_post.board.url,
+                    title=recent_post.title,
+                    short_body=recent_post.short_body(),
+                    image_url=recent_post.post_img.url if recent_post.post_img else static('logo.ico'),
+                    created_at=recent_post.created_at.strftime('%Y-%m-%d'),
+                )
+                for recent_post in recent_post_qs
+            ],
+            liked_ordered_posts=[
+                HomePost(
+                    id=liked_ordered_post.id,
+                    board_url=liked_ordered_post.board.url,
+                    title=liked_ordered_post.title,
+                    body=liked_ordered_post.body,
+                    like_count=liked_ordered_post.like_count,
+                    reply_count=liked_ordered_post.reply_count,
+                    author_nickname=liked_ordered_post.author.nickname,
+                    created_at=liked_ordered_post.created_at.strftime('%Y-%m-%d'),
+                )
+                for liked_ordered_post in liked_ordered_post_qs
+            ],
+            tag_infos=[
+                TagInfo(
+                    tag_name=_tag.tag_name,
+                    post_count=post_count_by_tag_id.get(_tag.id, 0),
+                ) for _tag in tags
+            ],
+            announce_infos=[
+                AnnounceInfo(
+                    title=announce.title,
+                    body=announce.body,
+                    created_at=announce.created_at,
+                ) for announce in get_announces().order_by('-id')[:5].values()
+            ],
+            lesson=HomeLesson(
+                summary=lesson.summary,
+                body=lesson.body,
+            ) if lesson else None,
+        ).model_dump(),
     )
 
 

@@ -3,8 +3,11 @@ from typing import List
 
 from django.db.models import QuerySet
 
-from chatgpt.consts import CHATGPT_URL, CHATGPT_HEADERS
-from chatgpt.dtos import ChatGPTConversationEntry
+from chatgpt.consts import (
+    CHATGPT_HEADERS,
+    CHATGPT_URL,
+)
+from chatgpt.dtos.common_dtos import ChatGPTConversationEntry
 from chatgpt.models import Lesson
 
 
