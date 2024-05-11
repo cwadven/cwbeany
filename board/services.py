@@ -44,3 +44,9 @@ def get_tags_active_post_count(tag_ids: List[int]) -> Dict[int, int]:
             'post_count',
         )
     )
+
+
+def update_post_reply_count(post_id: int) -> None:
+    post = Post.objects.get(id=post_id)
+    post.reply_count = post.replys.count()
+    post.save(update_fields=('reply_count',))
