@@ -9,6 +9,7 @@ from django.db.models import (
 )
 from board.models import (
     Board,
+    Like,
     Post,
     Reply,
     Rereply,
@@ -64,3 +65,12 @@ def update_post_rereply_count(post_id: int) -> None:
         return
     post.rereply_count = Rereply.objects.filter(post_id=post_id).count()
     post.save(update_fields=('rereply_count',))
+
+
+def update_post_like_count(post_id: int) -> None:
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return
+    post.like_count = Like.objects.filter(post_id=post_id).count()
+    post.save(update_fields=('like_count',))

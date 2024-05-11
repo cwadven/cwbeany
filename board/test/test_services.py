@@ -4,6 +4,7 @@ from accounts.models import User
 from board.models import (
     Board,
     BoardGroup,
+    Like,
     Post,
     Reply,
     Rereply,
@@ -14,6 +15,7 @@ from board.services import (
     get_boards_by_board_group_id,
     get_tags,
     get_tags_active_post_count,
+    update_post_like_count,
     update_post_reply_count,
     update_post_rereply_count,
 )
@@ -200,7 +202,7 @@ class TagPostCountTestCase(TestCase):
         self.assertEqual(active_posts_count, {})
 
 
-class PostReplyCountTestCase(TestCase):
+class PostUpdateReplyCountTestCase(TestCase):
     def setUp(self):
         # Given: User
         self.user = User.objects.create_user(
@@ -263,7 +265,7 @@ class PostReplyCountTestCase(TestCase):
         self.assertEqual(no_reply_post.reply_count, 0)
 
 
-class PostRereplyCountTestCase(TestCase):
+class PostUpdateRereplyCountTestCase(TestCase):
     def setUp(self):
         # Given: User
         self.user = User.objects.create_user(
@@ -335,3 +337,66 @@ class PostRereplyCountTestCase(TestCase):
         no_reply_post.refresh_from_db()
         # And: Rereply count is updated
         self.assertEqual(no_reply_post.rereply_count, 0)
+
+
+class PostUpdateLikeCountTestCase(TestCase):
+    def setUp(self):
+        # Given: User
+        self.user = User.objects.create_user(
+            username='test_user',
+            password='test_password',
+        )
+        # And: Board
+        self.board = Board.objects.create(
+            url='test_board',
+            name='test_board',
+        )
+        # And: Create Posts with Tags
+        self.active_post = Post.objects.create(
+            title='Active Post',
+            board=self.board,
+            is_active=True,
+            author=self.user,
+        )
+        self.like1 = Like.objects.create(post=self.active_post, author=self.user)
+        self.like2 = Like.objects.create(post=self.active_post, author=self.user)
+
+    def test_update_post_like_count_post_not_exists(self):
+        # Given: Post not exists
+        post_id = 0
+
+        # When: Update post Like count
+        update_post_like_count(post_id)
+
+        # Then:
+        # Noting happens
+
+    def test_update_post_like_count(self):
+        # Given: Test before update
+        self.assertEqual(self.active_post.like_count, 0)
+
+        # When: Update post Like count
+        update_post_like_count(self.active_post.id)
+
+        # Then: Post is updated
+        self.active_post.refresh_from_db()
+        # And: Like count is updated
+        self.assertEqual(self.active_post.like_count, 2)
+
+    def test_update_with_no_likes(self):
+        # Given: Test before update
+        no_reply_post = Post.objects.create(
+            title='Active Post',
+            board=self.board,
+            is_active=True,
+            author=self.user,
+        )
+        self.assertEqual(no_reply_post.like_count, 0)
+
+        # When: Update post Like count
+        update_post_like_count(no_reply_post.id)
+
+        # Then: Post is updated
+        no_reply_post.refresh_from_db()
+        # And: Like count is updated
+        self.assertEqual(no_reply_post.like_count, 0)
