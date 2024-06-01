@@ -243,7 +243,7 @@ def get_board_posts(request, board_url):
                 name=board_detail.name,
                 info=board_detail.info,
                 url=board_detail.url,
-                board_img_url=board_detail if board_detail.board_img else None,
+                board_img_url=board_detail.board_img if board_detail.board_img else None,
                 name_background_color=board_detail.name_background_color,
                 name_text_color=board_detail.name_text_color,
                 info_background_color=board_detail.info_background_color,
