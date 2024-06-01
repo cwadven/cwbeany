@@ -69,7 +69,7 @@ class BoardPostsResponse(BaseModel):
         default_factory=list,
         description='게시물 목록',
     )
-    page_range: List[int] = Field(
+    page_range: Optional[List[int]] = Field(
         default_factory=list,
         description='페이지 범위',
     )
