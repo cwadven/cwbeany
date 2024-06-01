@@ -5,17 +5,17 @@
 <style>
 .board-name {
     display: inline-block;
-    {% if board.name_background_color %}background: {{ board.name_background_color }};{% endif %}
+    {% if board_detail_info.name_background_color %}background: {{ board_detail_info.name_background_color }};{% endif %}
     padding: 10px;
     border-radius: 10px;
     font-weight: bold;
-    {% if board.name_text_color %}color: {{ board.name_text_color }};{% endif %}
+    {% if board_detail_info.name_text_color %}color: {{ board.name_text_color }};{% endif %}
 }
 .board-info {
-    {% if board.info_background_color %}background: {{ board.info_background_color }};{% endif %}
+    {% if board_detail_info.info_background_color %}background: {{ board_detail_info.info_background_color }};{% endif %}
     padding: 10px;
     border-radius: 10px;
-    {% if board.info_text_color %}color: {{ board.info_text_color }};{% endif %}
+    {% if board_detail_info.info_text_color %}color: {{ board_detail_info.info_text_color }};{% endif %}
 }
 .card_img{
     background-repeat:no-repeat;
