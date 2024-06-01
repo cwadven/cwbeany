@@ -69,9 +69,17 @@ class BoardPostsResponse(BaseModel):
         default_factory=list,
         description='게시물 목록',
     )
+    has_previous: bool = Field(
+        ...,
+        description='이전 페이지 존재 여부',
+    )
     has_next: bool = Field(
         ...,
         description='다음 페이지 존재 여부',
+    )
+    previous_page_number: Optional[int] = Field(
+        ...,
+        description='이전 페이지 번호',
     )
     current_page_number: int = Field(
         ...,
