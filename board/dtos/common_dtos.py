@@ -9,7 +9,7 @@ class TagInfo(BaseModel):
     post_count: int = Field(...)
 
 
-class Post(BaseModel):
+class BoardPost(BaseModel):
     id: int = Field(..., description='게시글 ID')
     board_url: str = Field(..., description='게시판 URL')
     title: str = Field(default='', description='제목')
@@ -22,5 +22,5 @@ class Post(BaseModel):
     created_at: str = Field(..., description='작성일')
 
 
-class HomePost(Post):
+class HomePost(BoardPost):
     pass

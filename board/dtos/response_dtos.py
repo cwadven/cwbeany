@@ -1,4 +1,7 @@
-from typing import List, Optional
+from typing import (
+    List,
+    Optional,
+)
 
 from pydantic import (
     BaseModel,
@@ -6,8 +9,8 @@ from pydantic import (
 )
 
 from board.dtos.common_dtos import (
+    BoardPost,
     HomePost,
-    Post,
     TagInfo,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
@@ -62,7 +65,7 @@ class BoardPostsResponse(BaseModel):
         ...,
         description='게시판 정보',
     )
-    posts: List[Post] = Field(
+    posts: List[BoardPost] = Field(
         default_factory=list,
         description='게시물 목록',
     )
