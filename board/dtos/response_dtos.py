@@ -27,7 +27,7 @@ class BoardDetailInfo(BaseModel):
     name: str = Field(...)
     info: str = Field(...)
     url: str = Field(...)
-    board_img_url: str = Field(...)
+    board_img_url: Optional[str] = Field(...)
     name_background_color: str = Field(...)
     name_text_color: str = Field(...)
     info_background_color: str = Field(...)
