@@ -382,7 +382,7 @@
 {% block middle_right %}
     <!-- 게시판 소개 -->
     <div class="p-4 bg-light rounded mb-2">
-        <h5><a href="{% url 'board:board' post.board.url %}">{{ post.board.name }}</a></h5>
+        <h5><a href="{% url 'board:get_board_posts' post.board.url %}">{{ post.board.name }}</a></h5>
         <div>{{ post.board.info }}</div>
     </div>
 
