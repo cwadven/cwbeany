@@ -7,6 +7,7 @@ from pydantic import (
 
 from board.dtos.common_dtos import (
     HomePost,
+    Post,
     TagInfo,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
@@ -20,6 +21,17 @@ class BoardSetGroupResponse(BaseModel):
 class BoardSetBoardInfo(BaseModel):
     name: str = Field(...)
     url: str = Field(...)
+
+
+class BoardDetailInfo(BaseModel):
+    name: str = Field(...)
+    info: str = Field(...)
+    url: str = Field(...)
+    board_img_url: str = Field(...)
+    name_background_color: str = Field(...)
+    name_text_color: str = Field(...)
+    info_background_color: str = Field(...)
+    info_text_color: str = Field(...)
 
 
 class HomeResponse(BaseModel):
@@ -42,4 +54,19 @@ class HomeResponse(BaseModel):
     lesson: Optional[HomeLesson] = Field(
         None,
         description='홈 화면에 표시할 ChatGPT 학습 정보',
+    )
+
+
+class BoardPostsResponse(BaseModel):
+    board_detail_info: BoardDetailInfo = Field(
+        ...,
+        description='게시판 정보',
+    )
+    posts: List[Post] = Field(
+        default_factory=list,
+        description='게시물 목록',
+    )
+    page_range: int = Field(
+        ...,
+        description='게시물 총 개수',
     )
