@@ -9,7 +9,7 @@
     padding: 10px;
     border-radius: 10px;
     font-weight: bold;
-    {% if board_detail_info.name_text_color %}color: {{ board.name_text_color }};{% endif %}
+    {% if board_detail_info.name_text_color %}color: {{ board_detail_info.name_text_color }};{% endif %}
 }
 .board-info {
     {% if board_detail_info.info_background_color %}background: {{ board_detail_info.info_background_color }};{% endif %}
