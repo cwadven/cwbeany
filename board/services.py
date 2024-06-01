@@ -33,6 +33,31 @@ def get_tags() -> QuerySet[Tag]:
     return Tag.objects.all()
 
 
+def get_active_filtered_posts(search: str = None,
+                              board_urls: List[str] = None,
+                              tag_names: List[str] = None) -> QuerySet[Post]:
+    q = Q()
+    qs = get_active_posts()
+    if search:
+        q = q & Q(title__icontains=search) | Q(body__icontains=search)
+    if board_urls:
+        q = q & Q(board__url__in=board_urls)
+    if tag_names:
+        tag_id_list = Tag.objects.filter(
+            tag_name__in=tag_names
+        ).values_list(
+            'id',
+            flat=True
+        )
+        q = q & Q(tag_set__in=tag_id_list)
+        qs = qs.prefetch_related('tag_set')
+    return qs.select_related(
+        'board',
+    ).filter(
+        q
+    )
+
+
 def get_tags_active_post_count(tag_ids: List[int]) -> Dict[int, int]:
     if not tag_ids:
         return {}

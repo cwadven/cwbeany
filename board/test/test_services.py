@@ -17,7 +17,7 @@ from board.services import (
     get_tags_active_post_count,
     update_post_like_count,
     update_post_reply_count,
-    update_post_rereply_count,
+    update_post_rereply_count, get_active_filtered_posts,
 )
 
 
@@ -400,3 +400,129 @@ class PostUpdateLikeCountTestCase(TestCase):
         no_reply_post.refresh_from_db()
         # And: Like count is updated
         self.assertEqual(no_reply_post.like_count, 0)
+
+
+class GetActiveFilteredPostsTestCase(TestCase):
+    def setUp(self):
+        # Create User
+        self.user = User.objects.create_user(
+            username='test_user',
+            password='test_password',
+        )
+        # Create Boards
+        self.django_board = Board.objects.create(
+            url='django',
+            name='django',
+        )
+        self.spring_board = Board.objects.create(
+            url='spring',
+            name='spring',
+        )
+        # Create Tags
+        self.python_tag = Tag.objects.create(tag_name='python')
+        self.java_tag = Tag.objects.create(tag_name='java')
+        # Create Posts
+        self.active_django_post = Post.objects.create(
+            title='Active Django post',
+            board=self.django_board,
+            is_active=True,
+            author=self.user,
+        )
+        self.inactive_django_post = Post.objects.create(
+            title='Inactive Django post',
+            board=self.django_board,
+            is_active=False,
+            author=self.user,
+        )
+        self.active_spring_post = Post.objects.create(
+            title='Active Spring post',
+            board=self.spring_board,
+            is_active=True,
+            author=self.user,
+        )
+        self.inactive_spring_post = Post.objects.create(
+            title='Inactive Spring post',
+            board=self.spring_board,
+            is_active=False,
+            author=self.user,
+        )
+        # Add tags to posts
+        self.active_django_post.tag_set.add(self.python_tag)
+        self.active_spring_post.tag_set.add(self.java_tag)
+
+    def test_filter_by_search_title(self):
+        # Given: Search keyword
+        search = 'django'
+
+        # When: Filter by search
+        results = get_active_filtered_posts(search=search)
+
+        # Then: Active Django post is returned
+        self.assertEquals(results.count(), 1)
+        self.assertEquals(results[0].id, self.active_django_post.id)
+
+    def test_filter_by_search_body(self):
+        # Given: Search keyword
+        search = 'hello'
+        # And: Add search keyword to body
+        self.active_spring_post.body = 'my friend Hello'
+        self.active_spring_post.save()
+
+        # When: Filter by search
+        results = get_active_filtered_posts(search=search)
+
+        # Then: Active Spring post is returned
+        self.assertEquals(results.count(), 1)
+        self.assertEquals(results[0].id, self.active_spring_post.id)
+
+    def test_filter_by_board_urls(self):
+        # Given: Board urls
+        board_urls = ['django']
+
+        # When: Filter by board urls
+        results = get_active_filtered_posts(board_urls=board_urls)
+
+        # Then: Active Django post is returned
+        self.assertEquals(results.count(), 1)
+        self.assertEquals(results[0].id, self.active_django_post.id)
+
+    def test_filter_by_tag_names(self):
+        # Given: Tag names
+        tag_names = ['python']
+
+        # When Filter by tag names
+        results = get_active_filtered_posts(tag_names=tag_names)
+
+        # Then: Active Django post is returned due to tag has python
+        self.assertEquals(results.count(), 1)
+        self.assertEquals(results[0].id, self.active_django_post.id)
+
+    def test_filter_by_multiple_criteria(self):
+        # Given: Search keyword
+        search = 'aaa'
+        # And: Add search keyword to body
+        self.active_spring_post.body = 'my friend Hello aaa'
+        self.active_spring_post.save()
+        # And: Search Board urls
+        board_urls = ['spring']
+        # And: Search Tag names
+        tag_names = ['java']
+
+        # When: Filter by multiple criteria
+        results = get_active_filtered_posts(search=search, board_urls=board_urls, tag_names=tag_names)
+
+        # Then: Active Spring post
+        self.assertEquals(results.count(), 1)
+        self.assertEquals(results[0].id, self.active_spring_post.id)
+
+    def test_no_filters(self):
+        # Given: No filters
+        # When: get_active_filtered_posts is called
+        results = get_active_filtered_posts()
+
+        # Then: All active posts are returned
+        self.assertEquals(results.count(), 2)
+        self.assertEquals(
+            set(results.values_list('id', flat=True)),
+            {self.active_django_post.id, self.active_spring_post.id},
+        )
