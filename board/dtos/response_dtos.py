@@ -69,6 +69,22 @@ class BoardPostsResponse(BaseModel):
         default_factory=list,
         description='게시물 목록',
     )
+    has_next: bool = Field(
+        ...,
+        description='다음 페이지 존재 여부',
+    )
+    current_page_number: int = Field(
+        ...,
+        description='현재 페이지 번호',
+    )
+    next_page_number: Optional[int] = Field(
+        ...,
+        description='다음 페이지 번호',
+    )
+    last_page_number: int = Field(
+        ...,
+        description='마지막 페이지 번호',
+    )
     page_range: Optional[List[int]] = Field(
         default_factory=list,
         description='페이지 범위',
