@@ -22,5 +22,5 @@ class Post(BaseModel):
     created_at: str = Field(..., description='작성일')
 
 
-class HomePost(BaseModel):
+class HomePost(Post):
     pass
