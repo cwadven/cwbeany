@@ -237,7 +237,7 @@
     <nav class="mb-2">
         <div class="nav-container">
         {% for board in nav_board %}
-            <a style="white-space: nowrap;" class="nav-link" href="{% url 'board:board' board.url %}">{{ board.name }}</a>
+            <a style="white-space: nowrap;" class="nav-link" href="{% url 'board:get_board_posts' board.url %}">{{ board.name }}</a>
         {% endfor %}
         {% for group in nav_group %}
             <div class="nav-link board-group" onclick="get_board_set_from_board_group({{ group.id }})">{{ group.group_name }}▼</div>

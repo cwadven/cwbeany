@@ -21,7 +21,7 @@ function display_board_group_constant(board_set) {
 
     board_set.forEach(function (data) {
         $('#from_board_group').append(
-            `<a style="word-break: keep-all;" class="nav-link" href="/${data.url}">${data.name}</a>`
+            `<a style="word-break: keep-all;" class="nav-link" href="/board/${data.url}">${data.name}</a>`
         );
     });
 }

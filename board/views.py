@@ -17,12 +17,13 @@ from django.templatetags.static import static
 from board.consts import BOARD_HOME_PATH
 from board.dtos.common_dtos import (
     HomePost,
-    TagInfo,
+    TagInfo, BoardPost,
 )
+from board.dtos.request_dtos import BoardPostsRequest
 from board.dtos.response_dtos import (
     HomeResponse,
     BoardSetBoardInfo,
-    BoardSetGroupResponse,
+    BoardSetGroupResponse, BoardPostsResponse, BoardDetailInfo,
 )
 from board.models import (
     Board,
@@ -39,7 +40,7 @@ from board.services import (
     get_tags_active_post_count,
     update_post_like_count,
     update_post_reply_count,
-    update_post_rereply_count,
+    update_post_rereply_count, get_active_filtered_posts,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
 from chatgpt.services import get_lessons
@@ -211,6 +212,65 @@ def board(request, board_url):
     }
 
     return render(request, 'board/board.html', context)
+
+
+def get_board_posts(request, board_url):
+    board_detail = get_object_or_404(Board, url=board_url)
+
+    board_posts_request = BoardPostsRequest.of(request)
+
+    paging_data = web_paging(
+        get_active_filtered_posts(
+            search=board_posts_request.search,
+            board_urls=[board_url],
+        ).select_related(
+            'author'
+        ).order_by(
+            '-id'
+        ),
+        int(request.GET.get('page', 1)),
+        10,
+        5,
+    )
+    page_posts = paging_data['page_posts']
+    has_previous = page_posts.has_previous()
+    has_next = page_posts.has_next()
+    return render(
+        request,
+        'board/board_detail.html',
+        BoardPostsResponse(
+            board_detail_info=BoardDetailInfo(
+                name=board_detail.name,
+                info=board_detail.info,
+                url=board_detail.url,
+                board_img_url=board_detail if board_detail.board_img else None,
+                name_background_color=board_detail.name_background_color,
+                name_text_color=board_detail.name_text_color,
+                info_background_color=board_detail.info_background_color,
+                info_text_color=board_detail.info_text_color,
+            ),
+            posts=[
+                BoardPost(
+                    id=post.id,
+                    title=post.title,
+                    short_body=post.short_body(),
+                    board_url=post.board.url,
+                    author_nickname=post.author.nickname,
+                    created_at=post.created_at.strftime('%Y-%m-%d'),
+                    like_count=post.like_count,
+                    reply_count=post.reply_count,
+                    image_url=post.post_img.url if post.post_img else static('logo.ico'),
+                ) for post in page_posts
+            ],
+            has_previous=has_previous,
+            has_next=has_next,
+            previous_page_number=page_posts.previous_page_number() if has_previous else None,
+            current_page_number=page_posts.number,
+            next_page_number=page_posts.next_page_number() if has_next else None,
+            last_page_number=page_posts.paginator.num_pages,
+            page_range=paging_data['page_range'],
+        ).model_dump()
+    )
 
 
 # 자세한 글 보기
