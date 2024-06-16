@@ -30,11 +30,11 @@ class BoardDetailInfo(BaseModel):
     name: str = Field(...)
     info: str = Field(...)
     url: str = Field(...)
-    board_img_url: Optional[str] = Field(...)
-    name_background_color: Optional[str] = Field(...)
-    name_text_color: Optional[str] = Field(...)
-    info_background_color: Optional[str] = Field(...)
-    info_text_color: Optional[str] = Field(...)
+    board_img_url: Optional[str] = Field(default=None)
+    name_background_color: Optional[str] = Field(default=None)
+    name_text_color: Optional[str] = Field(default=None)
+    info_background_color: Optional[str] = Field(default=None)
+    info_text_color: Optional[str] = Field(default=None)
 
 
 class HomeResponse(BaseModel):
