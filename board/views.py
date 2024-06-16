@@ -19,7 +19,7 @@ from board.dtos.common_dtos import (
     HomePost,
     TagInfo, BoardPost,
 )
-from board.dtos.request_dtos import BoardPostsRequest
+from board.dtos.request_dtos import BoardPostsRequest, TaggedPostsRequest
 from board.dtos.response_dtos import (
     HomeResponse,
     BoardSetBoardInfo,
@@ -248,6 +248,59 @@ def get_board_posts(request, board_url):
                 name_text_color=board_detail.name_text_color,
                 info_background_color=board_detail.info_background_color,
                 info_text_color=board_detail.info_text_color,
+            ),
+            posts=[
+                BoardPost(
+                    id=post.id,
+                    title=post.title,
+                    short_body=post.short_body(),
+                    board_url=post.board.url,
+                    author_nickname=post.author.nickname,
+                    created_at=post.created_at.strftime('%Y-%m-%d'),
+                    like_count=post.like_count,
+                    reply_count=post.reply_count,
+                    image_url=post.post_img.url if post.post_img else static('logo.ico'),
+                ) for post in page_posts
+            ],
+            has_previous=has_previous,
+            has_next=has_next,
+            previous_page_number=page_posts.previous_page_number() if has_previous else None,
+            current_page_number=page_posts.number,
+            next_page_number=page_posts.next_page_number() if has_next else None,
+            last_page_number=page_posts.paginator.num_pages,
+            page_range=paging_data['page_range'],
+        ).model_dump()
+    )
+
+
+def get_tagged_posts(request, tag_name):
+    tagged_posts_request = TaggedPostsRequest.of(request)
+    tag = get_object_or_404(Tag, tag_name=tag_name)
+
+    paging_data = web_paging(
+        get_active_filtered_posts(
+            search=tagged_posts_request.search,
+            tag_names=[tag.tag_name],
+        ).select_related(
+            'author'
+        ).order_by(
+            '-id'
+        ),
+        int(request.GET.get('page', 1)),
+        10,
+        5,
+    )
+    page_posts = paging_data['page_posts']
+    has_previous = page_posts.has_previous()
+    has_next = page_posts.has_next()
+    return render(
+        request,
+        'board/tagged_board_detail.html',
+        BoardPostsResponse(
+            board_detail_info=BoardDetailInfo(
+                name=tag_name,
+                info=tag_name,
+                url=tag_name,
             ),
             posts=[
                 BoardPost(

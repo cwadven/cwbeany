@@ -5,6 +5,7 @@ app_name = 'board'
 
 urlpatterns = [
     path('', home, name='home'),
+    path('board/tag/<str:tag_name>', get_tagged_posts, name='get_tagged_posts'),
     path('board/<str:board_url>', get_board_posts, name='get_board_posts'),
     path('<str:board_url>', board, name='board'),
     path('<str:board_url>/<int:pk>', post_detail, name='post'),
