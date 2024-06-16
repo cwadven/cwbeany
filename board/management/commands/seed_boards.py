@@ -14,6 +14,7 @@ class Command(BaseCommand):
         parser.add_argument("--reply-creation-number", default=0)
         parser.add_argument("--rereply-creation-number", default=0)
         parser.add_argument("--tag-creation-number", default=0)
+        # parser.add_argument("--tag-post-creation-number", default=0)
         parser.add_argument("--announce-creation-number", default=0)
 
     def handle(self, *args, **kwargs):
@@ -23,6 +24,7 @@ class Command(BaseCommand):
         reply_creation_number = int(kwargs.get("reply_creation_number"))
         rereply_creation_number = int(kwargs.get("rereply_creation_number"))
         tag_creation_number = int(kwargs.get("tag_creation_number"))
+        # tag_post_creation_number = int(kwargs.get("tag_post_creation_number"))
         announce_creation_number = int(kwargs.get("announce_creation_number"))
         seeder = Seed.seeder()
         if board_group_creation_number:
@@ -94,6 +96,14 @@ class Command(BaseCommand):
                     'tag_name': lambda x: seeder.faker.user_name(),
                 }
             )
+
+        # Add TagPosts
+        # if tag_post_creation_number:
+        #     for i in range(tag_post_creation_number):
+        #         tag = Tag.objects.order_by('?')[0]
+        #         post = Post.objects.exclude(tag_set=tag).order_by('?')[0]
+        #         if post:
+        #             post.tag_set.add(tag)
 
         # Add Announces
         if announce_creation_number:
