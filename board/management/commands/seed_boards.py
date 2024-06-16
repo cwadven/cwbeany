@@ -5,40 +5,102 @@ from accounts.models import *
 from control.models import *
 import random
 
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument("--number", default=1)
+        parser.add_argument("--board-group-creation-number", default=0)
+        parser.add_argument("--board-creation-number", default=0)
+        parser.add_argument("--post-creation-number", default=0)
+        parser.add_argument("--reply-creation-number", default=0)
+        parser.add_argument("--rereply-creation-number", default=0)
+        parser.add_argument("--tag-creation-number", default=0)
+        parser.add_argument("--announce-creation-number", default=0)
 
     def handle(self, *args, **kwargs):
-        number = kwargs.get("number")
+        board_group_creation_number = int(kwargs.get("board_group_creation_number"))
+        board_creation_number = int(kwargs.get("board_creation_number"))
+        post_creation_number = int(kwargs.get("post_creation_number"))
+        reply_creation_number = int(kwargs.get("reply_creation_number"))
+        rereply_creation_number = int(kwargs.get("rereply_creation_number"))
+        tag_creation_number = int(kwargs.get("tag_creation_number"))
+        announce_creation_number = int(kwargs.get("announce_creation_number"))
         seeder = Seed.seeder()
-        all_users = User.objects.all()
-        all_boards = Board.objects.all()
-        all_posts = Post.objects.all()
-        all_replys = Reply.objects.all()
-        # seeder.add_entity(Board, int(number), {
-        #     'url' : lambda x: seeder.faker.domain_word(),
-        #     'name' : lambda x: seeder.faker.domain_word(),
-        #     'board_img':None,
-        #     'attribute':0,
-        # })
-        # seeder.add_entity(Post, int(number), {
-        #     'def_tag' : None,
-        #     'post_img' : None,
-        #     'board' : lambda x: random.choice(all_boards),
-        #     'author' : lambda x: random.choice(all_users),
-        # })
-        # seeder.add_entity(Reply, int(number), {
-        #     'post_id' : lambda x: random.choice(all_posts),
-        #     'author' : lambda x: random.choice(all_users),
-        # })
-        seeder.add_entity(Rereply, int(number), {
-            'post': lambda x: random.choice(all_posts),
-            'reply': lambda x: random.choice(all_replys),
-            'author': lambda x: random.choice(all_users),
-        })
-        # seeder.add_entity(Tag, int(number), {
-        #     'tag_name' : lambda x: seeder.faker.user_name(),
-        # })
-        seeder.add_entity(Announce, int(number))
+        if board_group_creation_number:
+            # Add BoardGroups
+            seeder.add_entity(
+                BoardGroup,
+                board_group_creation_number,
+                {
+                    'group_name': lambda x: seeder.faker.domain_word(),
+                }
+            )
+
+        # Add Boards
+        if board_creation_number:
+            seeder.add_entity(
+                Board,
+                board_creation_number,
+                {
+                    'board_group': lambda x: random.choice(BoardGroup.objects.all()),
+                    'url': lambda x: seeder.faker.domain_word(),
+                    'name': lambda x: seeder.faker.domain_word(),
+                    'board_img': None,
+                    'attribute': 0,
+                }
+            )
+
+        if post_creation_number:
+            # Add Posts
+            seeder.add_entity(
+                Post,
+                post_creation_number,
+                {
+                    'def_tag': None,
+                    'post_img': None,
+                    'board': lambda x: random.choice(Board.objects.all()),
+                    'author': lambda x: random.choice(User.objects.all()),
+                }
+            )
+
+        # Add Replys
+        if reply_creation_number:
+            seeder.add_entity(
+                Reply,
+                reply_creation_number,
+                {
+                    'post': lambda x: random.choice(Post.objects.all()),
+                    'author': lambda x: random.choice(User.objects.all()),
+                }
+            )
+
+        # Add Rereplys
+        if rereply_creation_number:
+            seeder.add_entity(
+                Rereply,
+                rereply_creation_number,
+                {
+                    'post': lambda x: random.choice(Post.objects.all()),
+                    'reply': lambda x: random.choice(Reply.objects.all()),
+                    'author': lambda x: random.choice(User.objects.all()),
+                }
+            )
+
+        # Add Tags
+        if tag_creation_number:
+            seeder.add_entity(
+                Tag,
+                tag_creation_number,
+                {
+                    'tag_name': lambda x: seeder.faker.user_name(),
+                }
+            )
+
+        # Add Announces
+        if announce_creation_number:
+            seeder.add_entity(
+                Announce,
+                announce_creation_number,
+            )
+
+        # Execute
         seeder.execute()
