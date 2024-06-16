@@ -13,3 +13,13 @@ class BoardPostsRequest(BaseModel):
         return BoardPostsRequest(
             search=request.GET.get('search'),
         )
+
+
+class TaggedPostsRequest(BaseModel):
+    search: Optional[str] = Field(...)
+
+    @staticmethod
+    def of(request):
+        return BoardPostsRequest(
+            search=request.GET.get('search'),
+        )
