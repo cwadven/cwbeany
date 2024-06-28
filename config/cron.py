@@ -4,11 +4,17 @@ import datetime
 
 from django.conf import settings
 
-from chatgpt.consts import LessonSummary
-from chatgpt.dtos import ChatGPTConversationEntry
-from chatgpt.models import Lesson, LessonInformation
+from chatgpt.dtos.common_dtos import ChatGPTConversationEntry
+from chatgpt.models import (
+    Lesson,
+    LessonInformation,
+)
 from chatgpt.services import get_chatgpt_response
-from control.models import TodayYesterday, IPVisitant
+from common.common_utils.io_utils import send_email
+from control.models import (
+    TodayYesterday,
+    IPVisitant,
+)
 
 
 def update_yesterday_and_today_visitor():
@@ -95,3 +101,14 @@ def get_chatgpt_lesson():
     )
     print("----created----")
     print("-----ended-----")
+
+
+def health_check():
+    print("----sending----")
+    send_email(
+        f'[Beany 블로그] django-cron health check',
+        'common/email_templates/health_check.html',
+        {},
+        ['cwadven@kakao.com'],
+    )
+    print("----sended----")
