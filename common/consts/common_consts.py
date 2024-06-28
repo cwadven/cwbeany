@@ -2,6 +2,7 @@ REPLY_NOTIFICATION = 'reply_notification'
 REREPLY_NOTIFICATION = 'rereply_notification'
 LIKE_NOTIFICATION = 'like_notification'
 HEALTH_CHECK = 'health_check'
+BACKUP_SQL = 'backup_sql'
 
 
 EMAIL_TEMPLATE_MAPPER = {
@@ -9,4 +10,5 @@ EMAIL_TEMPLATE_MAPPER = {
     REREPLY_NOTIFICATION: 'email/notification/rereply_notification.html',
     LIKE_NOTIFICATION: 'email/notification/like_notification.html',
     HEALTH_CHECK: 'email/common/health_check.html',
+    BACKUP_SQL: 'email/common/backup_sql.html',
 }
