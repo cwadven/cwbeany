@@ -165,7 +165,7 @@
     <h5>TAGS</h5>
     <div class="d-flex flex-wrap">
         {% for tag_info in tag_infos %}
-            <a href="{% url 'board:board' '_'|add:tag_info.tag_name %}" class="badge bg-primary m-1 text-decoration-none text-white">{{tag_info.tag_name}} <span class="badge rounded-pill bg-light text-primary">{{tag_info.post_count}}</span></a>
+            <a href="{% url 'board:get_tagged_posts' tag_info.tag_name %}" class="badge bg-primary m-1 text-decoration-none text-white">{{tag_info.tag_name}} <span class="badge rounded-pill bg-light text-primary">{{tag_info.post_count}}</span></a>
         {% endfor %}
     </div>
 </div>
