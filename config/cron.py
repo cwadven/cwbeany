@@ -10,10 +10,10 @@ from chatgpt.models import (
     LessonInformation,
 )
 from chatgpt.services import get_chatgpt_response
-from common.common_utils.io_utils import send_email
+from common.common_utils.io_utils import send_email, send_email_with_file
 from common.consts.common_consts import (
     EMAIL_TEMPLATE_MAPPER,
-    HEALTH_CHECK,
+    HEALTH_CHECK, BACKUP_SQL,
 )
 from control.models import (
     TodayYesterday,
@@ -59,7 +59,7 @@ def database_backup():
     NAME = settings.DATABASES['default']['NAME']
     USER = settings.DATABASES['default']['USER']
     PASSWORD = settings.DATABASES['default']['PASSWORD']
-
+    print("----backup sql connecting----")
     conn = pymysql.connect(
         host=HOST,
         user=USER,
@@ -72,8 +72,17 @@ def database_backup():
     backup_file_name = f'nully_blog_{datetime.date.today().strftime("%Y-%m-%d")}.sql'
     os.system(
         f'mysqldump -h {HOST} -u {USER} -p{PASSWORD} {NAME} > {backup_path}/{backup_file_name}')
-
+    print("----backup sql created----")
     conn.close()
+    print("----backup sql email sending----")
+    send_email_with_file(
+        f'[Beany 블로그] {datetime.date.today().strftime("%Y-%m-%d")} 데이터베이스 백업',
+        EMAIL_TEMPLATE_MAPPER[BACKUP_SQL],
+        {},
+        'cwadven@kakao.com',
+        backup_path + '/' + backup_file_name,
+    )
+    print("----backup sql email sended----")
 
 
 def get_chatgpt_lesson():
