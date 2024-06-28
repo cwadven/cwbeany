@@ -11,6 +11,10 @@ from chatgpt.models import (
 )
 from chatgpt.services import get_chatgpt_response
 from common.common_utils.io_utils import send_email
+from common.consts.common_consts import (
+    EMAIL_TEMPLATE_MAPPER,
+    HEALTH_CHECK,
+)
 from control.models import (
     TodayYesterday,
     IPVisitant,
@@ -107,7 +111,7 @@ def health_check():
     print("----sending----")
     send_email(
         f'[Beany 블로그] django-cron health check',
-        'common/email_templates/health_check.html',
+        EMAIL_TEMPLATE_MAPPER[HEALTH_CHECK],
         {},
         ['cwadven@kakao.com'],
     )
