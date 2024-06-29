@@ -8,7 +8,7 @@
 
 https://cwbeany.com
 
-<img alt="logo.png" src="https://github.com/cwadven/cwbeany/blob/master/docs/logos/main_logo.png?raw=true" style="width=100%; max-width=500px" />
+<img alt="logo.png" src="https://github.com/cwadven/cwbeany/blob/master/docs/logos/main_logo.webp?raw=true" style="width=100%; max-width=500px" />
 
 <br>
 
@@ -32,11 +32,15 @@ https://cwbeany.com
 
 ## Project Duration
 
-[edit . 2021-10-19]
+[edit . 2024-06-29]
 
 ▶ 2021-03-16 ~ 2021-03-21 : 첫 배포 완성
 <br>
-▶ 2021-03-21 ~ : 유지보수
+▶ 2021-03-21 ~ 2024-01-?? : 유지보수 및 업데이트
+<br>
+▶ 2024-01-?? ~ 2024-05-04 : 오라클 클라우드 이슈로 Server Down
+<br>
+▶ 2024-05-04 ~ : cwbeany.com 으로 다시 리뉴얼 및 유지보수 개발
 
 <br>
 
@@ -50,15 +54,16 @@ https://cwbeany.com
 
 ## Deploy
 
-[edit . 2021-10-19]
+[edit . 2024-06-29]
 
-![Oracle](https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle&logoColor=white) ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white) 
+![Rasberry Pi](https://img.shields.io/badge/Raspberry_Pi-%23C51A4A.svg?style=for-the-badge&logo=Raspberry-Pi&logoColor=white) <br>
+![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white) <br>
 
 <br>
 
 ## CI/CD
 
-[edit . 2021-12-18]
+[edit . 2024-06-29]
 
 ![GitHub Actions](https://img.shields.io/badge/githubactions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
 
@@ -137,6 +142,6 @@ Project Root
 
 ## Database Structure
 
-[edit . 2024-05-04]
+[edit . 2024-06-29]
 
-![img.png](https://github.com/cwadven/cwbeany/blob/master/docs/erd/erd.png?raw=true)
+...
