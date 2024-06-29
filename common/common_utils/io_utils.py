@@ -28,7 +28,7 @@ def send_email(title: str, html_body_content: str, payload: dict, to: list) -> N
     )
 
 
-def send_email_with_file(title: str, html_body_content: str, payload: dict, to: str, file_path: str) -> None:
+def send_email_with_file(title: str, html_body_content: str, payload: dict, to: list, file_path: str) -> None:
     """
     title: 메일 제목
     html_body_content: 적용할 templates 폴더에 있는 html 파일 위치
@@ -44,7 +44,7 @@ def send_email_with_file(title: str, html_body_content: str, payload: dict, to: 
         title,
         strip_tags(message),
         settings.EMAIL_HOST_USER,
-        [to],
+        to,
     )
     if file_path:
         email.attach_file(file_path)
