@@ -79,7 +79,7 @@ def database_backup():
         f'[Beany 블로그] {datetime.date.today().strftime("%Y-%m-%d")} 데이터베이스 백업',
         EMAIL_TEMPLATE_MAPPER[BACKUP_SQL],
         {},
-        ['cwadven@kakao.com'],
+        settings.NOTICE_EMAILS,
         backup_path + '/' + backup_file_name,
     )
     print("----backup sql email sended----")
@@ -122,6 +122,6 @@ def health_check():
         f'[Beany 블로그] django-cron health check',
         EMAIL_TEMPLATE_MAPPER[HEALTH_CHECK],
         {},
-        ['cwadven@kakao.com'],
+        settings.NOTICE_EMAILS,
     )
     print("----sended----")

@@ -6,6 +6,7 @@ from .PRIVATE_SETTING import (
     EMAIL_HOST_USER,
     EMAIL_HOST_PASSWORD,
     CHATGPT_KEY,
+    NOTICE_EMAILS,
 )
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -282,6 +283,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 EMAIL_HOST_USER = EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+
+NOTICE_EMAILS = NOTICE_EMAILS
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
