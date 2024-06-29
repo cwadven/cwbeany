@@ -194,9 +194,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 CRONJOBS = [
+    # UTC Time 기준, 15시 --> 한국 0시
     ('0 15 * * *', 'config.cron.update_yesterday_and_today_visitor', '>> /var/www/beany_blog/visitor_update.log'),
-    ('0 0 1 * *', 'config.cron.database_backup', '>> /var/www/beany_blog/database_backup.log'),
-    ('0 3 * * *', 'config.cron.get_chatgpt_lesson', '>> /var/www/beany_blog/get_chatgpt_lesson.log'),
+    ('0 15 * * 5', 'config.cron.database_backup', '>> /var/www/beany_blog/database_backup.log'),
+    ('0 15 * * *', 'config.cron.get_chatgpt_lesson', '>> /var/www/beany_blog/get_chatgpt_lesson.log'),
     ('0 0 * * *', 'config.cron.health_check', '>> /var/www/beany_blog/health_check.log'),
 ]
 
