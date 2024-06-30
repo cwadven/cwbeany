@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import (
-    Count,
     Q,
 )
 from django.shortcuts import (
@@ -17,13 +16,19 @@ from django.templatetags.static import static
 from board.consts import BOARD_HOME_PATH
 from board.dtos.common_dtos import (
     HomePost,
-    TagInfo, BoardPost,
+    TagInfo,
+    BoardPost,
 )
-from board.dtos.request_dtos import BoardPostsRequest, TaggedPostsRequest
+from board.dtos.request_dtos import (
+    BoardPostsRequest,
+    TaggedPostsRequest,
+)
 from board.dtos.response_dtos import (
     HomeResponse,
     BoardSetBoardInfo,
-    BoardSetGroupResponse, BoardPostsResponse, BoardDetailInfo,
+    BoardSetGroupResponse,
+    BoardPostsResponse,
+    BoardDetailInfo,
 )
 from board.models import (
     Board,
@@ -35,12 +40,13 @@ from board.models import (
 )
 from board.services import (
     get_active_posts,
+    get_board_paged_posts,
     get_boards_by_board_group_id,
     get_tags,
     get_tags_active_post_count,
     update_post_like_count,
     update_post_reply_count,
-    update_post_rereply_count, get_active_filtered_posts,
+    update_post_rereply_count,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
 from chatgpt.services import get_lessons
@@ -219,18 +225,10 @@ def get_board_posts(request, board_url):
 
     board_posts_request = BoardPostsRequest.of(request)
 
-    paging_data = web_paging(
-        get_active_filtered_posts(
-            search=board_posts_request.search,
-            board_urls=[board_url],
-        ).select_related(
-            'author'
-        ).order_by(
-            '-id'
-        ),
-        int(request.GET.get('page', 1)),
-        10,
-        5,
+    paging_data = get_board_paged_posts(
+        search=board_posts_request.search,
+        board_urls=[board_url],
+        page=request.GET.get('page', 1)
     )
     page_posts = paging_data['page_posts']
     has_previous = page_posts.has_previous()
@@ -277,18 +275,10 @@ def get_tagged_posts(request, tag_name):
     tagged_posts_request = TaggedPostsRequest.of(request)
     tag = get_object_or_404(Tag, tag_name=tag_name)
 
-    paging_data = web_paging(
-        get_active_filtered_posts(
-            search=tagged_posts_request.search,
-            tag_names=[tag.tag_name],
-        ).select_related(
-            'author'
-        ).order_by(
-            '-id'
-        ),
-        int(request.GET.get('page', 1)),
-        10,
-        5,
+    paging_data = get_board_paged_posts(
+        search=tagged_posts_request.search,
+        tag_names=[tag.tag_name],
+        page=request.GET.get('page', 1)
     )
     page_posts = paging_data['page_posts']
     has_previous = page_posts.has_previous()
