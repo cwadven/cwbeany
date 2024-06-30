@@ -77,9 +77,11 @@
                         '<img src="' + popup.image_url + '" height="' + popup.height + '" width="' + popup.width + '"/>')
                     : '') +
                 '</div>' +
-                '<div style="white-space: pre-line; text-align: center;">' +
+                (popup.description ?
+                    '<div style="white-space: pre-line; text-align: center;">' +
                     (popup.description || '') +
-                '</div>' +
+                    '</div>'
+                    : '') +
                 '<div class="bottom-modal" style="margin: 0 10px">' +
                 '<label style="font-size: 15px" for="todayUnSee_popup_modal_' + (popup.id || 0) + '" class="check_s">' +
                 '오늘 하루 보이지 않음' +
