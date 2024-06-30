@@ -220,6 +220,52 @@ def board(request, board_url):
     return render(request, 'board/board.html', context)
 
 
+def get_all_board_posts(request):
+    board_posts_request = BoardPostsRequest.of(request)
+    board_detail_display = '전체 게시판'
+    if board_posts_request.search:
+        board_detail_display = board_posts_request.search
+
+    paging_data = get_board_paged_posts(
+        search=board_posts_request.search,
+        page=request.GET.get('page', 1)
+    )
+    page_posts = paging_data['page_posts']
+    has_previous = page_posts.has_previous()
+    has_next = page_posts.has_next()
+    return render(
+        request,
+        'board/all_board_detail.html',
+        BoardPostsResponse(
+            board_detail_info=BoardDetailInfo(
+                name=board_detail_display,
+                info=board_detail_display,
+                url=board_detail_display,
+            ),
+            posts=[
+                BoardPost(
+                    id=post.id,
+                    title=post.title,
+                    short_body=post.short_body(),
+                    board_url=post.board.url,
+                    author_nickname=post.author.nickname,
+                    created_at=post.created_at.strftime('%Y-%m-%d'),
+                    like_count=post.like_count,
+                    reply_count=post.reply_count,
+                    image_url=post.post_img.url if post.post_img else static('logo.ico'),
+                ) for post in page_posts
+            ],
+            has_previous=has_previous,
+            has_next=has_next,
+            previous_page_number=page_posts.previous_page_number() if has_previous else None,
+            current_page_number=page_posts.number,
+            next_page_number=page_posts.next_page_number() if has_next else None,
+            last_page_number=page_posts.paginator.num_pages,
+            page_range=paging_data['page_range'],
+        ).model_dump()
+    )
+
+
 def get_board_posts(request, board_url):
     board_detail = get_object_or_404(Board, url=board_url)
 
