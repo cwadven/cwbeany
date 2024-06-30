@@ -1,6 +1,6 @@
 from typing import (
     Dict,
-    List,
+    List, Union,
 )
 from django.db.models import (
     Count,
@@ -15,6 +15,7 @@ from board.models import (
     Rereply,
     Tag,
 )
+from common.common_utils.paginator_utils import web_paging
 
 
 def get_boards_by_board_group_id(board_group_id: int) -> List[Board]:
@@ -72,6 +73,24 @@ def get_tags_active_post_count(tag_ids: List[int]) -> Dict[int, int]:
             'post_count',
         )
     )
+
+
+def get_board_paged_posts(search: str = None, page: Union[int, str] = 1, board_urls: List[str] = None, tag_names: List[str] = None):
+    paging_data = web_paging(
+        get_active_filtered_posts(
+            search=search,
+            board_urls=board_urls,
+            tag_names=tag_names,
+        ).select_related(
+            'author'
+        ).order_by(
+            '-id'
+        ),
+        int(page),
+        10,
+        5,
+    )
+    return paging_data
 
 
 def update_post_reply_count(post_id: int) -> None:

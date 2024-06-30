@@ -1,6 +1,9 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 
 from accounts.models import User
+from board.managers import PostQuerySet
 from board.models import (
     Board,
     BoardGroup,
@@ -11,13 +14,15 @@ from board.models import (
     Tag,
 )
 from board.services import (
+    get_active_filtered_posts,
     get_active_posts,
+    get_board_paged_posts,
     get_boards_by_board_group_id,
     get_tags,
     get_tags_active_post_count,
     update_post_like_count,
     update_post_reply_count,
-    update_post_rereply_count, get_active_filtered_posts,
+    update_post_rereply_count,
 )
 
 
@@ -526,3 +531,90 @@ class GetActiveFilteredPostsTestCase(TestCase):
             set(results.values_list('id', flat=True)),
             {self.active_django_post.id, self.active_spring_post.id},
         )
+
+
+class GetBoardPagedPostsTest(TestCase):
+    def setUp(self):
+        # Create User
+        self.user = User.objects.create_user(
+            username='test_user',
+            password='test_password',
+        )
+        # Create Boards
+        self.django_board = Board.objects.create(
+            url='django',
+            name='django',
+        )
+        self.spring_board = Board.objects.create(
+            url='spring',
+            name='spring',
+        )
+        # Create Tags
+        self.python_tag = Tag.objects.create(tag_name='python')
+        self.java_tag = Tag.objects.create(tag_name='java')
+        # Create Posts
+        self.active_django_post = Post.objects.create(
+            title='Active Django post',
+            board=self.django_board,
+            is_active=True,
+            author=self.user,
+        )
+        self.inactive_django_post = Post.objects.create(
+            title='Inactive Django post',
+            board=self.django_board,
+            is_active=False,
+            author=self.user,
+        )
+        self.active_spring_post = Post.objects.create(
+            title='Active Spring post',
+            board=self.spring_board,
+            is_active=True,
+            author=self.user,
+        )
+        self.inactive_spring_post = Post.objects.create(
+            title='Inactive Spring post',
+            board=self.spring_board,
+            is_active=False,
+            author=self.user,
+        )
+        # Add tags to posts
+        self.active_django_post.tag_set.add(self.python_tag)
+        self.active_spring_post.tag_set.add(self.java_tag)
+
+    @patch('board.services.web_paging')
+    @patch('board.services.get_active_filtered_posts')
+    def test_get_board_paged_posts(self,
+                                   mock_get_active_filtered_posts,
+                                   mock_web_paging):
+        # Given: Search keyword
+        search = 'django'
+        # And: Board urls
+        board_urls = ['django']
+        # And: Tag names
+        tag_names = ['python']
+        # And: Page
+        page = 1
+        # And: Mock get_active_filtered_posts
+        mock_get_active_filtered_posts.return_value = Post.objects.filter(
+            id=self.active_django_post.id
+        )
+
+        # When: Get board paged posts
+        get_board_paged_posts(
+            search=search,
+            board_urls=board_urls,
+            tag_names=tag_names,
+            page=page,
+        )
+
+        # Then: get_active_filtered_posts and web_paging is called
+        mock_get_active_filtered_posts.assert_called_once_with(
+            search=search,
+            board_urls=board_urls,
+            tag_names=tag_names,
+        )
+        called_args, _ = mock_web_paging.call_args
+        self.assertIsInstance(called_args[0], PostQuerySet)
+        self.assertEqual(called_args[1], page)
+        self.assertEqual(called_args[2], 10)
+        self.assertEqual(called_args[3], 5)
