@@ -83,6 +83,12 @@
 {% endif %}
 {% endblock %}
 
+{% block full %}
+    <div>testtest</div>
+    {% include "components/modals/image_modal.html" with modal_name='home_popup_modal_' %}
+{% endblock %}
+
+
 {% block top %}
 <!-- 최근 포스트 -->
 <h5 class="rounded-top border border-dark bg-light p-2">✏ 최근 포스트</h5>

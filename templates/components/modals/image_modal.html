@@ -1,0 +1,98 @@
+<!-- Modal 생성을 위해 Server 에서 COOKIE (modal_name_숫자) 관리 필요 -->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script>
+    function get_popup_modal_ajax(modal_name) {
+        $.ajax({
+            type: 'GET',
+            url: '/popup/modal/' + modal_name,
+            success: function (data) {
+                if (data['modals'].length > 0) {
+                    createPopups(data['modals'], modal_name);
+                    const btnClose = document.querySelector('.btn-close');
+                    const modal = document.querySelector('.draggable.custom-modal');
+
+                    btnClose.addEventListener('click', function () {
+                        modal.style.display = 'none';
+                    });
+
+                    $('.draggable').draggable({
+                        handle: '.header-modal',
+                        touchAction: 'none',
+                        containment: 'window',
+                        start: function () {
+                            $(this).css('z-index', getHighestZIndex() + 1);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    $(function () {
+        get_popup_modal_ajax('{{ modal_name }}');
+    });
+
+    function setPopupCookie(modalIdName, checkbox) {
+        if (checkbox.checked) {
+            const date = new Date();
+            date.setDate(date.getDate() + 1);
+            document.cookie = modalIdName + '=true; expires=' + date.toUTCString() + '; path=/';
+            document.querySelector('#' + modalIdName).remove();
+        }
+    }
+
+    function getHighestZIndex() {
+        let highestZIndex = 0;
+        $('.draggable').each(function () {
+            const zIndex = parseInt($(this).css('z-index'), 10);
+            if (zIndex > highestZIndex) {
+                highestZIndex = zIndex;
+            }
+        });
+        return highestZIndex;
+    }
+
+    function createPopups(popups, modal_name) {
+        popups.forEach(function (popup) {
+            var modalId = modal_name + (popup.id || 0);
+            var modalWidth = popup.width ? popup.width + 20 : 320;
+            var modalLeft = popup.left || 50;
+            var modalTop = popup.top ? popup.top + 100 : 200;
+
+            var popupHtml =
+                '<div id="' + modalId + '" class="draggable custom-modal" ' +
+                'style="width: ' + modalWidth + 'px; left: ' + modalLeft + 'px; top: ' + modalTop + 'px; position: absolute;">' +
+                '<div class="modal-content">' +
+                '<div class="header-modal" style="cursor: move; display: flex; justify-content: space-between; margin: 10px;">' +
+                '<div class="title-modal" id="staticBackdropLabel">' + (popup.title || '') + '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ' +
+                'onclick="closeModal(\'' + modalId + '\')"></button>' +
+                '</div>' +
+                '<div class="body-modal" style="height: ' + (popup.height || 300) + 'px; display: flex; justify-content: center;">' +
+                (popup.image_url ?
+                    (popup.on_click_link ?
+                        '<a href="' + popup.on_click_link + '" target="_blank">' +
+                        '<img src="' + popup.image_url + '" height="' + popup.height + '" width="' + popup.width + '"/>' +
+                        '</a>' :
+                        '<img src="' + popup.image_url + '" height="' + popup.height + '" width="' + popup.width + '"/>')
+                    : '') +
+                '</div>' +
+                '<div class="bottom-modal" style="margin: 0 10px">' +
+                '<label style="font-size: 15px" for="todayUnSee_popup_modal_' + (popup.id || 0) + '" class="check_s">' +
+                '오늘 하루 보이지 않음' +
+                '</label>' +
+                '<input type="checkbox" id="todayUnSee_popup_modal_' + (popup.id || 0) + '" class="checkbox" ' +
+                'onclick="setPopupCookie(\'' + modalId + '\', this);">' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+
+            document.body.insertAdjacentHTML('beforeend', popupHtml);
+        });
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.remove();
+    }
+</script>
