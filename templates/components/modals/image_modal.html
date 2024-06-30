@@ -4,7 +4,7 @@
     function get_popup_modal_ajax(modal_name) {
         $.ajax({
             type: 'GET',
-            url: '/popup/modal/' + modal_name,
+            url: '{% url 'popup:get_popup_modal' modal_name %}',
             success: function (data) {
                 if (data['modals'].length > 0) {
                     createPopups(data['modals'], modal_name);
