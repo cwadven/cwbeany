@@ -6,3 +6,4 @@ from pydantic import (
 
 class PopupModalResponse(BaseModel):
     modals: list = Field(...)
+    keyword: str = Field(...)
