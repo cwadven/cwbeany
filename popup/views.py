@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import JsonResponse
 
 from common.common_utils.string_utils import get_filtered_by_startswith_text_and_convert_to_standards
 from popup.dtos.object_dtos import PopupModalItem
@@ -15,16 +15,16 @@ def get_popup_modal(request, modal_type_name: str):
     )
     modal = POPUP_MODAL_MAPPER.get(modal_type_name)
     if not modal:
-        return HttpResponse(
+        return JsonResponse(
             PopupModalResponse(
                 modals=[],
                 keyword=modal_type_name,
-            ).model_dump_json(),
-            'application/json',
+            ).model_dump(),
+            status=200,
         )
 
     active_popups = get_active_popups(modal)
-    return HttpResponse(
+    return JsonResponse(
         PopupModalResponse(
             modals=[
                 PopupModalItem.of(popup, top=index * 50, left=index * 50)
@@ -34,6 +34,6 @@ def get_popup_modal(request, modal_type_name: str):
                 )
             ],
             keyword=modal_type_name,
-        ).model_dump_json(),
-        'application/json',
+        ).model_dump(),
+        status=200,
     )
