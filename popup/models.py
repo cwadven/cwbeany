@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Popup(models.Model):
-    image = models.TextField(verbose_name='이미지', blank=True, null=True)
+    image = models.ImageField(upload_to='popup/', null=True, blank=True)
     description = models.TextField(verbose_name='관리자 보기 위한 설명', blank=True, null=True)
     on_click_link = models.TextField(verbose_name='이미지 클릭 시 링크', null=True)
     height = models.PositiveIntegerField(verbose_name='모달 높이')
