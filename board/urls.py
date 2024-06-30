@@ -8,7 +8,6 @@ urlpatterns = [
     path('board', get_all_board_posts, name='all_board_posts'),
     path('board/tag/<str:tag_name>', get_tagged_posts, name='get_tagged_posts'),
     path('board/<str:board_url>', get_board_posts, name='get_board_posts'),
-    path('<str:board_url>', board, name='board'),
     path('<str:board_url>/<int:pk>', post_detail, name='post'),
     path('<str:board_url>/<int:pk>/reply', reply_write, name='reply'),
     path('<str:board_url>/<int:pk>/rereply', rereply_write, name='rereply'),

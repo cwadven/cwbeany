@@ -1,7 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import (
-    Q,
-)
 from django.shortcuts import (
     get_object_or_404,
     render,
@@ -50,7 +47,6 @@ from board.services import (
 )
 from chatgpt.dtos.common_dtos import HomeLesson
 from chatgpt.services import get_lessons
-from common.common_utils.paginator_utils import web_paging
 from control.dtos.common_dtos import AnnounceInfo
 from control.services import get_announces
 
@@ -150,74 +146,6 @@ def home(request):
             ) if lesson else None,
         ).model_dump(),
     )
-
-
-# 게시글 목록 (게시판)
-def board(request, board_url):
-    q = Q()
-
-    board_obj = None
-    tag_board = None
-
-    # page:
-    # 1 게시판 페이지
-    # 2 태그 페이지
-    # 3 검색 페이지
-    page = 1
-
-    search = request.GET.get('search')
-
-    # 태그 페이지
-    if board_url[0] == '_':
-        page = 2
-        tag_option = board_url[1:]
-
-    # 검색 페이지
-    if board_url == 'search':
-        page = 3
-
-    if search:
-        tag_id_list = Tag.objects.filter(
-            tag_name__icontains=search
-        ).values_list(
-            'id', flat=True
-        )
-
-        q = q & Q(title__icontains=search) | Q(body__icontains=search) | Q(tag_set__in=tag_id_list)
-
-    # 게시판 선택
-    if page == 1:
-        board_obj = get_object_or_404(Board, url=board_url)
-        posts = board_obj.post_set.filter(q).order_by(
-            '-created_at'
-        )
-    # 태그 검색
-    elif page == 2:
-        tag_board = get_object_or_404(Tag, tag_name=tag_option)
-        posts = tag_board.post_set.filter(q).order_by(
-            '-created_at'
-        )
-    # 전체 검색
-    elif page == 3:
-        posts = Post.objects.active().filter(q).order_by(
-            '-created_at'
-        )
-
-    paging_obj = web_paging(
-        posts,
-        int(request.GET.get('page', 1)),
-        10,
-        5,
-    )
-
-    context = {
-        'posts': paging_obj.get('page_posts'),
-        'page_range': paging_obj.get('page_range'),
-        'board': board_obj,
-        'tag_board': tag_board,
-    }
-
-    return render(request, 'board/board.html', context)
 
 
 def get_all_board_posts(request):
