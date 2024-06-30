@@ -3,8 +3,9 @@ from django.db import models
 
 class Popup(models.Model):
     image = models.ImageField(upload_to='popup/', null=True, blank=True)
-    description = models.TextField(verbose_name='관리자 보기 위한 설명', blank=True, null=True)
-    on_click_link = models.TextField(verbose_name='이미지 클릭 시 링크', null=True)
+    title = models.CharField(verbose_name='제목', max_length=255, blank=True, null=True)
+    description = models.TextField(verbose_name='설명', blank=True, null=True)
+    on_click_link = models.TextField(verbose_name='이미지 클릭 시 링크', null=True, blank=True)
     height = models.PositiveIntegerField(verbose_name='모달 높이')
     width = models.PositiveIntegerField(verbose_name='모달 너비')
     sequence = models.PositiveIntegerField(
