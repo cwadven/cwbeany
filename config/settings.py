@@ -56,6 +56,7 @@ PROJECT_APPS = [
     'control',
     'chatgpt',
     'common',
+    'popup',
 ]
 
 PROJECT_SETTING_APPS = [

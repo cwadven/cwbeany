@@ -28,6 +28,8 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     # 소셜 로그인
     path('accounts/', include('allauth.urls')),
+    # Popup
+    path('popup/', include('popup.urls')),
 
     # ckeditor
     path('ckeditor/', include('ckeditor_uploader.urls')),
