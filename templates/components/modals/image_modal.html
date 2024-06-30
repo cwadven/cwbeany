@@ -72,9 +72,9 @@
                 (popup.image_url ?
                     (popup.on_click_link ?
                         '<a href="' + popup.on_click_link + '" target="_blank">' +
-                        '<img src="' + popup.image_url + '" height="' + popup.height + '" width="' + popup.width + '"/>' +
+                        '<img style="max-width: 100%" src="' + popup.image_url + '" height="' + popup.height + '" width="' + popup.width + '"/>' +
                         '</a>' :
-                        '<img src="' + popup.image_url + '" height="' + popup.height + '" width="' + popup.width + '"/>')
+                        '<img style="max-width: 100%" src="' + popup.image_url + '" height="' + popup.height + '" width="' + popup.width + '"/>')
                     : '') +
                 '</div>' +
                 (popup.description ?
