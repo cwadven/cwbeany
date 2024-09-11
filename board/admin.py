@@ -104,7 +104,7 @@ class PostAdmin(admin.ModelAdmin):
         try:
             if instance.is_active:
                 requests.post(
-                    url=f'{settings.WEB_HOOK_ADDRESS}/webhook/0e70fe59-69db-4641-88f9-aa50888f3561',
+                    url=f'{settings.WEB_HOOK_ADDRESS}',
                     data={
                         'board_name': instance.board.url,
                         'board_id': instance.id,
