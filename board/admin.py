@@ -106,7 +106,7 @@ class PostAdmin(admin.ModelAdmin):
                 requests.post(
                     url=f'{settings.WEB_HOOK_ADDRESS}/webhook/0e70fe59-69db-4641-88f9-aa50888f3561',
                     data={
-                        'board_name': instance.board.name,
+                        'board_name': instance.board.url,
                         'board_id': instance.id,
                     },
                 )
