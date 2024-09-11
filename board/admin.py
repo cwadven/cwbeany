@@ -1,3 +1,5 @@
+import requests
+
 from django.contrib import admin
 from .models import *
 
@@ -98,6 +100,18 @@ class PostAdmin(admin.ModelAdmin):
         instance = form.instance
         if instance.def_tag:
             instance.tag_save()
+
+        try:
+            if instance.is_active:
+                requests.post(
+                    url=f'{settings.WEB_HOOK_ADDRESS}/webhook/0e70fe59-69db-4641-88f9-aa50888f3561',
+                    data={
+                        'board_name': instance.board.name,
+                        'board_id': instance.id,
+                    },
+                )
+        except Exception as e:
+            pass
 
     _comment_count.admin_order_field = '_comment_count'
     _like_count.admin_order_field = '_like_count'

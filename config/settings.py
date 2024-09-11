@@ -7,6 +7,7 @@ from .PRIVATE_SETTING import (
     EMAIL_HOST_PASSWORD,
     CHATGPT_KEY,
     NOTICE_EMAILS,
+    WEB_HOOK_ADDRESS,
 )
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -316,3 +317,5 @@ CHATGPT_KEY = CHATGPT_KEY
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+WEB_HOOK_ADDRESS = WEB_HOOK_ADDRESS
