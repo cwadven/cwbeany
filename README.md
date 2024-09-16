@@ -4,7 +4,7 @@
 
 |                                                         cwbeany                                                          |
 |:------------------------------------------------------------------------------------------------------------------------:|
-| <img src="https://github.com/cwadven/cwbeany/blob/master/docs/logos/main_logo.png?raw=true" width="200" alt="cwbeany" /> |
+| <img src="https://github.com/cwadven/cwbeany/blob/master/docs/logos/main_logo.webp?raw=true" width="200" alt="cwbeany" /> |
 |                                                        **서비스 주소**                                                        |
 |                                                   https://cwbeany.com                                                    |
 |                                                     **서비스 개발 히스토리**                                                      |
