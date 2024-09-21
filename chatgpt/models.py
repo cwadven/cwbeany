@@ -62,4 +62,4 @@ class PostSummary(models.Model):
         verbose_name_plural = '게시글 요약'
 
     def __str__(self):
-        return f'id: {self.id} post_id: {self.post_id} body: {self.body[:10]}'
+        return f'id: {self.id} post_id: {self.post_id}'
