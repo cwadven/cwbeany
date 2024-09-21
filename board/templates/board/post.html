@@ -190,6 +190,46 @@
             -o-transition: width .4s ease;
             transition: width .4s ease;
         }
+
+        .summary-card {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px 0 20px 0;
+            padding: 20px;
+            border: 1px solid #D2D2D2;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        .summary-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .summary-card-header img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .summary-card-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .summary-card-content {
+            font-size: 1em;
+            color: #333;
+            line-height: 1.6;
+        }
+        .arrow {
+            display: block;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 1.5em;
+            color: #888;
+        }
     </style>
 {% endblock %}
 
@@ -211,6 +251,28 @@
         <i class="bi bi-person-circle"></i> {{ post.author.nickname }} <i
             class="bi bi-calendar-week"></i> {{ post.created_at|date:"Y-m-d" }}
     </div>
+
+    {% if post_summary %}
+    <div class="summary-card">
+        <div class="summary-card-header">
+            <h3>ChatGPT 요약</h3>
+        </div>
+        {% if post_summary.status == 'DONE' %}
+        <div class="summary-card-content" id="summary-card-content-done">
+            {{ post_summary.body }}
+        </div>
+        {% elif post_summary.status == 'PROCESSING' %}
+        <div class="summary-card-content" id="summary-card-content-processing">
+            요약중입니다. 잠시만 기다려주세요.
+        </div>
+        {% elif post_summary.status == 'FAIL' %}
+        <div class="summary-card-content" id="summary-card-content-fail">
+            요약에 실패했습니다... :(
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
     <!-- 글 body -->
     <div class="mb-2">
         {{ post.body|safe }}
