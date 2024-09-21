@@ -11,3 +11,9 @@ CHATGPT_HEADERS = {
 
 class LessonSummary(StrValueLabel):
     PYTHON_TIP = ('Python Tip', '파이썬 꿀팁')
+
+
+class ProcessStatus(StrValueLabel):
+    PROCESSING = ('PROCESSING', '처리중')
+    DONE = ('DONE', '처리완료')
+    FAIL = ('FAIL', '실패')
