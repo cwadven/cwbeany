@@ -1,6 +1,9 @@
 import requests
 
 from django.contrib import admin
+
+from chatgpt.models import PostSummary
+from chatgpt.task import update_post_summary
 from .models import *
 from .services import request_n8n_webhook
 
@@ -103,7 +106,9 @@ class PostAdmin(admin.ModelAdmin):
             instance.tag_save()
 
         if instance.is_active:
+            post_summary = PostSummary.objects.create(post_id=instance.id)
             request_n8n_webhook(instance.board.url, instance.id)
+            update_post_summary.apply_async((instance.body, post_summary.id))
 
     _comment_count.admin_order_field = '_comment_count'
     _like_count.admin_order_field = '_like_count'
