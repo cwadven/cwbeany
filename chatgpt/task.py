@@ -13,10 +13,11 @@ from common.consts.common_consts import (
 from config.celery import app
 
 
-@app.task
+@app.task(time_limit=30)
 def update_post_summary(body: str, post_summary_id: int) -> None:
-    response = get_chatgpt_response(POST_SUMMARY_SYSTEM_PROMPT, body, [])
+    post_summary = None
     try:
+        response = get_chatgpt_response(POST_SUMMARY_SYSTEM_PROMPT, body, [])
         post_summary = PostSummary.objects.get(id=post_summary_id)
         post_summary.body = response
         post_summary.status = ProcessStatus.DONE.value
@@ -24,6 +25,16 @@ def update_post_summary(body: str, post_summary_id: int) -> None:
     except PostSummary.DoesNotExist:
         send_email(
             f'[Beany 블로그] Update Post Summary Issue Raised - PostSummary id: {post_summary_id}',
+            EMAIL_TEMPLATE_MAPPER[POST_SUMMARY_ISSUE],
+            {},
+            settings.NOTICE_EMAILS,
+        )
+    except Exception as e:
+        post_summary = PostSummary.objects.get(id=post_summary_id)
+        post_summary.status = ProcessStatus.FAIL.value
+        post_summary.save()
+        send_email(
+            f'[Beany 블로그] Task Timeout - PostSummary id: {post_summary_id}',
             EMAIL_TEMPLATE_MAPPER[POST_SUMMARY_ISSUE],
             {},
             settings.NOTICE_EMAILS,

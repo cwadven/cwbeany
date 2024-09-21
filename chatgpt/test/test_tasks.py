@@ -7,6 +7,7 @@ from board.models import (
     Board,
     Post,
 )
+from celery.exceptions import SoftTimeLimitExceeded
 from chatgpt.consts import (
     POST_SUMMARY_SYSTEM_PROMPT,
     ProcessStatus,
@@ -67,6 +68,43 @@ class UpdatePostSummaryTest(TestCase):
         # Then: PostSummary.DoesNotExist 예외가 발생했을 때 이메일이 전송되는지 확인합니다.
         mock_send_email.assert_called_once_with(
             f'[Beany 블로그] Update Post Summary Issue Raised - PostSummary id: {invalid_post_summary_id}',
+            EMAIL_TEMPLATE_MAPPER[POST_SUMMARY_ISSUE],
+            {},
+            settings.NOTICE_EMAILS,
+        )
+
+    @patch('chatgpt.task.get_chatgpt_response')
+    @patch('chatgpt.task.send_email')
+    def test_update_post_summary_timeout(self, mock_send_email, mock_get_chatgpt_response):
+        # Given: 존재하지 않는 PostSummary ID를 사용합니다.
+        invalid_post_summary_id = 999
+        mock_get_chatgpt_response.return_value = self.response_body
+
+        # When: update_post_summary 함수를 호출합니다.
+        update_post_summary(self.body, invalid_post_summary_id)
+
+        # Then: PostSummary.DoesNotExist 예외가 발생했을 때 이메일이 전송되는지 확인합니다.
+        mock_send_email.assert_called_once_with(
+            f'[Beany 블로그] Update Post Summary Issue Raised - PostSummary id: {invalid_post_summary_id}',
+            EMAIL_TEMPLATE_MAPPER[POST_SUMMARY_ISSUE],
+            {},
+            settings.NOTICE_EMAILS,
+        )
+
+    @patch('chatgpt.task.get_chatgpt_response')
+    @patch('chatgpt.task.send_email')
+    def test_update_post_summary_exception_exceeded(self, mock_send_email, mock_get_chatgpt_response):
+        # Given: ChatGPT 응답을 모킹하고
+        mock_get_chatgpt_response.side_effect = Exception
+
+        # When: update_post_summary 태스크를 호출합니다.
+        update_post_summary(self.body, self.post_summary.id)
+
+        # Then: 타임아웃 발생 시 PostSummary 상태가 FAIL로 업데이트되었는지 확인합니다.
+        post_summary = PostSummary.objects.get(id=self.post_summary.id)
+        self.assertEqual(post_summary.status, ProcessStatus.FAIL.value)
+        mock_send_email.assert_called_once_with(
+            f'[Beany 블로그] Task Timeout - PostSummary id: {self.post_summary.id}',
             EMAIL_TEMPLATE_MAPPER[POST_SUMMARY_ISSUE],
             {},
             settings.NOTICE_EMAILS,
