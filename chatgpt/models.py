@@ -1,5 +1,7 @@
 from django.db import models
 
+from chatgpt.consts import ProcessStatus
+
 
 class LessonInformation(models.Model):
     """
@@ -41,3 +43,23 @@ class Lesson(models.Model):
         return '이전까지 알려준 꿀팁 제외하고,' \
                ' 파이썬 3.7 이상 버전 꿀팁 코드를 최대 3개만 알려줘' \
                ' 예제 코드까지 작성해줘'
+
+
+class PostSummary(models.Model):
+    body = models.TextField(help_text='본문', null=True, blank=True)
+    post = models.ForeignKey('board.Post', on_delete=models.CASCADE, related_name='post_summary')
+    status = models.CharField(
+        choices=ProcessStatus.choices(),
+        max_length=45,
+        default=ProcessStatus.PROCESSING.value,
+        help_text='처리상태',
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = '게시글 요약'
+        verbose_name_plural = '게시글 요약'
+
+    def __str__(self):
+        return f'id: {self.id} post_id: {self.post_id} body: {self.body[:10]}'
