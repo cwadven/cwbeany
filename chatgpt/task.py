@@ -1,3 +1,4 @@
+from billiard.exceptions import SoftTimeLimitExceeded
 from django.conf import settings
 from chatgpt.consts import (
     POST_SUMMARY_SYSTEM_PROMPT,
@@ -29,7 +30,7 @@ def update_post_summary(body: str, post_summary_id: int) -> None:
             {},
             settings.NOTICE_EMAILS,
         )
-    except Exception as e:
+    except SoftTimeLimitExceeded:
         post_summary = PostSummary.objects.get(id=post_summary_id)
         post_summary.status = ProcessStatus.FAIL.value
         post_summary.save()

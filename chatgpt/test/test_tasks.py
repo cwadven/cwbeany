@@ -95,7 +95,7 @@ class UpdatePostSummaryTest(TestCase):
     @patch('chatgpt.task.send_email')
     def test_update_post_summary_exception_exceeded(self, mock_send_email, mock_get_chatgpt_response):
         # Given: ChatGPT 응답을 모킹하고
-        mock_get_chatgpt_response.side_effect = Exception
+        mock_get_chatgpt_response.side_effect = SoftTimeLimitExceeded
 
         # When: update_post_summary 태스크를 호출합니다.
         update_post_summary(self.body, self.post_summary.id)
