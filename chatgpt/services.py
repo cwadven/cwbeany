@@ -8,7 +8,10 @@ from chatgpt.consts import (
     CHATGPT_URL,
 )
 from chatgpt.dtos.common_dtos import ChatGPTConversationEntry
-from chatgpt.models import Lesson
+from chatgpt.models import (
+    Lesson,
+    PostSummary,
+)
 
 
 def get_chatgpt_response(system_prompt: str, prompt: str,
@@ -41,3 +44,7 @@ def get_chatgpt_response(system_prompt: str, prompt: str,
 
 def get_lessons() -> QuerySet[Lesson]:
     return Lesson.objects.all()
+
+
+def get_latest_post_summary_by_post_id(post_id: int) -> PostSummary:
+    return PostSummary.objects.filter(post_id=post_id).order_by('-created_at').first()
