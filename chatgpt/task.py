@@ -16,7 +16,6 @@ from config.celery import app
 
 @app.task(time_limit=30)
 def update_post_summary(body: str, post_summary_id: int) -> None:
-    post_summary = None
     try:
         response = get_chatgpt_response(POST_SUMMARY_SYSTEM_PROMPT, body, [])
         post_summary = PostSummary.objects.get(id=post_summary_id)
