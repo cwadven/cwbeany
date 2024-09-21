@@ -1,7 +1,11 @@
+import requests
 from typing import (
     Dict,
-    List, Union,
+    List,
+    Union,
 )
+
+from django.conf import settings
 from django.db.models import (
     Count,
     Q,
@@ -118,3 +122,17 @@ def update_post_like_count(post_id: int) -> None:
         return
     post.like_count = Like.objects.filter(post_id=post_id).count()
     post.save(update_fields=('like_count',))
+
+
+def request_n8n_webhook(board_url, post_id) -> None:
+    try:
+        requests.post(
+            url=f'{settings.WEB_HOOK_ADDRESS}',
+            data={
+                'board_name': board_url,
+                'board_id': post_id,
+            },
+            timeout=5,
+        )
+    except requests.Timeout:
+        pass

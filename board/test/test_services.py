@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from django.conf import settings
 from django.test import TestCase
 
 from accounts.models import User
@@ -20,6 +21,7 @@ from board.services import (
     get_boards_by_board_group_id,
     get_tags,
     get_tags_active_post_count,
+    request_n8n_webhook,
     update_post_like_count,
     update_post_reply_count,
     update_post_rereply_count,
@@ -618,3 +620,30 @@ class GetBoardPagedPostsTest(TestCase):
         self.assertEqual(called_args[1], page)
         self.assertEqual(called_args[2], 10)
         self.assertEqual(called_args[3], 5)
+
+
+class RequestN8nWebhookTest(TestCase):
+
+    def setUp(self):
+        # Given: 필요한 테스트 데이터를 설정합니다.
+        self.board_url = "http://example.com/board"
+        self.post_id = 123
+        self.webhook_url = settings.WEB_HOOK_ADDRESS
+
+    @patch('board.services.requests.post')
+    def test_request_n8n_webhook_success(self, mock_post):
+        # Given: 성공적인 POST 요청을 모킹합니다.
+        mock_post.return_value.status_code = 200
+
+        # When: request_n8n_webhook 함수를 호출합니다.
+        request_n8n_webhook(self.board_url, self.post_id)
+
+        # Then: requests.post가 올바른 URL과 데이터로 호출되었는지 확인합니다.
+        mock_post.assert_called_once_with(
+            url=f'{self.webhook_url}',
+            data={
+                'board_name': self.board_url,
+                'board_id': self.post_id,
+            },
+            timeout=5,
+        )
