@@ -2,6 +2,7 @@ import requests
 
 from django.contrib import admin
 from .models import *
+from .services import request_n8n_webhook
 
 
 class RereplyInline(admin.TabularInline):
@@ -101,18 +102,8 @@ class PostAdmin(admin.ModelAdmin):
         if instance.def_tag:
             instance.tag_save()
 
-        try:
-            if instance.is_active:
-                requests.post(
-                    url=f'{settings.WEB_HOOK_ADDRESS}',
-                    data={
-                        'board_name': instance.board.url,
-                        'board_id': instance.id,
-                    },
-                    timeout=5,
-                )
-        except Exception as e:
-            pass
+        if instance.is_active:
+            request_n8n_webhook(instance.board.url, instance.id)
 
     _comment_count.admin_order_field = '_comment_count'
     _like_count.admin_order_field = '_like_count'
