@@ -132,9 +132,38 @@
         rereply_delete = (e) => {
             $(location).attr('href', "{% url 'board:rereply_delete' post.board.url '00000' %}".replace('00000', e.target.id.replace('rereply_', '')));
         }
-
-
     </script>
+    
+    {% if post_summary %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // "summary-card-content-processing" 요소가 있는지 확인
+                let processingElement = document.getElementById('summary-card-content-processing');
+
+                // 요소가 존재할 경우에만 폴링 시작
+                if (processingElement) {
+                    let pollingInterval = setInterval(function () {
+                        // API를 호출 (여기선 fetch를 예로 사용)
+                        fetch("{% url 'chatgpt:get_summary_by_post_id' post_id=post.id %}")  // API 엔드포인트로 변경
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status !== 'PROCESSING') {
+                                    let div_id = 'summary-card-content-' + data.status.toLowerCase()
+                                    document.getElementById('summary-card-content-processing').id = div_id;
+                                    document.getElementById(div_id).innerHTML = data.summary || '';
+                                    clearInterval(pollingInterval);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching the API:', error);
+                                // 에러 발생 시에도 폴링 중단할 수 있음
+                                clearInterval(pollingInterval);
+                            });
+                    }, 5000);  // 5000ms = 5초
+                }
+            });
+        </script>
+    {% endif %}
 {% endblock %}
 
 {% block style %}
@@ -223,12 +252,25 @@
             color: #333;
             line-height: 1.6;
         }
-        .arrow {
-            display: block;
-            margin-top: 10px;
-            text-align: center;
-            font-size: 1.5em;
-            color: #888;
+        
+        .loading-spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-top: 4px solid #3498db; /* 파란색 */
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-right: 10px; /* 텍스트와 스피너 간격 */
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 {% endblock %}
@@ -263,6 +305,7 @@
         </div>
         {% elif post_summary.status == 'PROCESSING' %}
         <div class="summary-card-content" id="summary-card-content-processing">
+            <div class="loading-spinner"></div>
             요약중입니다. 잠시만 기다려주세요.
         </div>
         {% elif post_summary.status == 'FAIL' %}
@@ -272,7 +315,7 @@
         {% endif %}
     </div>
     {% endif %}
-    
+
     <!-- 글 body -->
     <div class="mb-2">
         {{ post.body|safe }}
