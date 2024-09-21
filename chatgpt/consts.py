@@ -17,3 +17,8 @@ class ProcessStatus(StrValueLabel):
     PROCESSING = ('PROCESSING', '처리중')
     DONE = ('DONE', '처리완료')
     FAIL = ('FAIL', '실패')
+
+
+POST_SUMMARY_SYSTEM_PROMPT = ('너는 테크 블로그에 작성한 내용을 간단하게 요약해주는 비서야.'
+                              '요약은 최대 5줄로 해줘. 블로그 글을 분석해서 한글로 요약해줘.'
+                              '답변에 "네 알겠습니다." 같은 내용 넣지 말고 내용을 바로 요약해줘')
