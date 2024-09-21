@@ -109,6 +109,7 @@ class PostAdmin(admin.ModelAdmin):
                         'board_name': instance.board.url,
                         'board_id': instance.id,
                     },
+                    timeout=5,
                 )
         except Exception as e:
             pass
