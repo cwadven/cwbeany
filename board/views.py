@@ -46,7 +46,7 @@ from board.services import (
     update_post_rereply_count,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
-from chatgpt.services import get_lessons
+from chatgpt.services import get_lessons, get_latest_post_summary_by_post_id
 from control.dtos.common_dtos import AnnounceInfo
 from control.services import get_announces
 
@@ -304,6 +304,7 @@ def post_detail(request, board_url, pk):
     next_post = qs.filter(id__gt=pk).order_by('id').first()
 
     post = get_object_or_404(qs, board__url=board_url, pk=pk)
+    post_summary = get_latest_post_summary_by_post_id(post.id)
 
     if request.user.is_authenticated:
         like_check = Like.objects.filter(author=request.user, post=post).exists()
@@ -314,6 +315,7 @@ def post_detail(request, board_url, pk):
         'like_check': like_check,
         'qs': qs,
         'post': post,
+        'post_summary': post_summary,
         'prev_post': prev_post,
         'next_post': next_post,
     }
