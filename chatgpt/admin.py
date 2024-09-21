@@ -1,6 +1,10 @@
 from django.contrib import admin
 
-from chatgpt.models import Lesson, LessonInformation
+from chatgpt.models import (
+    Lesson,
+    LessonInformation,
+    PostSummary,
+)
 
 
 @admin.register(Lesson)
@@ -20,4 +24,16 @@ class LessonInformationAdmin(admin.ModelAdmin):
         'system_prompt',
         'prompt',
         'tag',
+    )
+
+
+@admin.register(PostSummary)
+class PostSummaryAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'body',
+        'post',
+        'status',
+        'created_at',
+        'updated_at',
     )
