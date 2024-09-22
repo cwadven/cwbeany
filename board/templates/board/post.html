@@ -133,7 +133,7 @@
             $(location).attr('href', "{% url 'board:rereply_delete' post.board.url '00000' %}".replace('00000', e.target.id.replace('rereply_', '')));
         }
     </script>
-    
+
     {% if post_summary %}
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -223,11 +223,24 @@
         .summary-card {
             width: 100%;
             max-width: 1200px;
-            margin: 20px 0 20px 0;
+            margin: 20px 0;
             padding: 20px;
-            border: 1px solid #D2D2D2;
             border-radius: 8px;
             box-sizing: border-box;
+            background-color: white; /* 카드의 배경색 */
+            position: relative;
+        }
+
+        .summary-card:before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 12px; /* border-radius보다 살짝 크게 */
+            background: linear-gradient(to right, red, orange, #d0d036, green, blue, indigo, violet);
+            z-index: -1; /* 카드의 내용보다 뒤로 보내기 */
         }
 
         .summary-card-header {
@@ -252,16 +265,16 @@
             color: #333;
             line-height: 1.6;
         }
-        
+
         .loading-spinner {
-        border: 4px solid rgba(0, 0, 0, 0.1);
-        border-top: 4px solid #3498db; /* 파란색 */
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        animation: spin 1s linear infinite;
-        display: inline-block;
-        margin-right: 10px; /* 텍스트와 스피너 간격 */
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #3498db; /* 파란색 */
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px; /* 텍스트와 스피너 간격 */
         }
 
         @keyframes spin {
@@ -295,6 +308,7 @@
     </div>
 
     {% if post_summary %}
+    <!-- 글 요약본 -->
     <div class="summary-card">
         <div class="summary-card-header">
             <h3>ChatGPT 요약</h3>
@@ -314,6 +328,7 @@
         </div>
         {% endif %}
     </div>
+    <hr>
     {% endif %}
 
     <!-- 글 body -->
