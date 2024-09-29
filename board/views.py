@@ -443,6 +443,7 @@ def reply_delete(request, board_url, pk):
     if reply.author == request.user or request.user.is_superuser:
         reply.delete()
         update_post_reply_count(post_id)
+        update_post_rereply_count(post_id)
     return HttpResponseRedirect(reverse('board:post', args=[board_url, post_id]))
 
 
