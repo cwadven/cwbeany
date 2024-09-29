@@ -896,7 +896,7 @@ class GetReplysByPostIdTest(TestCase):
 
         # Then: replys
         self.assertEqual(len(replys), 0)
-        self.assertEqual(replys, [])
+        self.assertEqual(list(replys), [])
 
 
 class GetRereplysByPostIdTest(TestCase):
@@ -962,4 +962,4 @@ class GetRereplysByPostIdTest(TestCase):
 
         # Then: replys
         self.assertEqual(len(rereplys), 0)
-        self.assertEqual(rereplys, [])
+        self.assertEqual(list(rereplys), [])

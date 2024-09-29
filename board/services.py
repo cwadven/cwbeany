@@ -180,16 +180,12 @@ def get_tags_by_post_id(post_id: int) -> List[Tag]:
 
 
 def get_replys_by_post_id(post_id: int) -> List[Reply]:
-    return list(
-        Reply.objects.filter(
-            post_id=post_id,
-        )
+    return Reply.objects.filter(
+        post_id=post_id,
     )
 
 
 def get_rereplys_by_post_id(post_id: int) -> List[Rereply]:
-    return list(
-        Rereply.objects.filter(
-            post_id=post_id,
-        )
+    return Rereply.objects.filter(
+        post_id=post_id,
     )
