@@ -22,7 +22,7 @@ from board.dtos.common_dtos import (
     ImportantUrl,
     RecentBoardPostLayer,
     RecentPost,
-    TagInfo,
+    TagInfo, DetailPostSummary,
 )
 from board.dtos.request_dtos import (
     BoardPostsRequest,
@@ -350,7 +350,10 @@ def post_detail(request, board_url, pk):
             reply_count=post.reply_count + post.rereply_count,
             created_at=post.created_at.strftime('%Y-%m-%d'),
         ),
-        'post_summary': post_summary,
+        'post_summary': DetailPostSummary(
+            status=post_summary.status,
+            body=post_summary.body,
+        ),
         'prev_post': prev_post,
         'next_post': next_post,
         'important_urls': [
