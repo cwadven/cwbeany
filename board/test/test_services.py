@@ -32,7 +32,7 @@ from board.services import (
     update_post_like_count,
     update_post_reply_count,
     update_post_rereply_count,
-    get_value_rereplys_key_rereply_reply_ids_by_post_id,
+    get_value_rereplies_key_rereply_reply_ids_by_post_id,
 )
 
 
@@ -967,7 +967,7 @@ class GetRereplysByPostIdTest(TestCase):
         self.assertEqual(list(rereplys), [])
 
 
-class GetValueRereplysKeyReReplyReplyIdsByPostIdTest(TestCase):
+class GetValueRerepliesKeyReReplyReplyIdsByPostIdTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
             username='test_user',
@@ -1008,30 +1008,30 @@ class GetValueRereplysKeyReReplyReplyIdsByPostIdTest(TestCase):
         )
 
         # When:
-        rereply_by_reply_ids = get_value_rereplys_key_rereply_reply_ids_by_post_id(
+        rereplies_by_reply_ids = get_value_rereplies_key_rereply_reply_ids_by_post_id(
             self.active_django_post.id,
         )
 
         # Then:
-        self.assertIsInstance(rereply_by_reply_ids, defaultdict)
-        self.assertEqual(len(rereply_by_reply_ids[self.reply.id]), 2)
+        self.assertIsInstance(rereplies_by_reply_ids, defaultdict)
+        self.assertEqual(len(rereplies_by_reply_ids[self.reply.id]), 2)
         self.assertEqual(
-            {rereply.id for rereply in rereply_by_reply_ids[self.reply.id]},
+            {rereply.id for rereply in rereplies_by_reply_ids[self.reply.id]},
             {self.rereply1.id, self.rereply2.id},
         )
         self.assertEqual(
-            {rereply.body for rereply in rereply_by_reply_ids[self.reply.id]},
+            {rereply.body for rereply in rereplies_by_reply_ids[self.reply.id]},
             {self.rereply1.body, self.rereply2.body},
         )
 
     def test_should_return_when_rereply_not_exists(self):
         # Given:
         # When:
-        rereply_by_reply_ids = get_value_rereplys_key_rereply_reply_ids_by_post_id(
+        rereplies_by_reply_ids = get_value_rereplies_key_rereply_reply_ids_by_post_id(
             self.active_django_post.id,
         )
 
         # Then:
-        self.assertIsInstance(rereply_by_reply_ids, defaultdict)
-        self.assertEqual(len(rereply_by_reply_ids), 0)
-        self.assertEqual(rereply_by_reply_ids, {})
+        self.assertIsInstance(rereplies_by_reply_ids, defaultdict)
+        self.assertEqual(len(rereplies_by_reply_ids), 0)
+        self.assertEqual(rereplies_by_reply_ids, {})
