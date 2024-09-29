@@ -96,3 +96,8 @@ class DetailPost(BaseModel):
 class DetailPostSummary(BaseModel):
     status: str = Field(..., description='상태')
     body: Optional[str] = Field(..., description='본문')
+
+
+class DetailNavigateOtherPost(BaseModel):
+    id: int = Field(..., description='게시글 ID')
+    board_url: Optional[str] = Field(..., description='게시판 URL')
