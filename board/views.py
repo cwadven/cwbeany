@@ -400,7 +400,7 @@ def rereply_write(request, board_url, pk):
         rereply.author = request.user
         rereply.body = request.POST.get('rereply')
         rereply.save()
-        update_post_rereply_count(pk)
+        update_post_rereply_count(reply.post_id)
     return HttpResponseRedirect(reverse('board:post', args=[board_url, reply.post.id]))
 
 
