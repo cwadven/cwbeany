@@ -364,13 +364,13 @@
     </div>
     <!-- 이전/다음 게시글 -->
     <div class="d-flex justify-content-between mb-2">
-        {% if prev_post %}
-            <a class="other_post" href="{% url 'board:post' prev_post.board.url prev_post.id %}">👈 이전글</a>
+        {% if prev_post_navigation %}
+            <a class="other_post" href="{% url 'board:post' prev_post_navigation.board_url prev_post_navigation.post_id %}">👈 이전글</a>
         {% else %}
             <div></div>
         {% endif %}
-        {% if next_post %}
-            <a class="other_post" href="{% url 'board:post' next_post.board.url next_post.id %}">다음글 👉</a>
+        {% if next_post_navigation %}
+            <a class="other_post" href="{% url 'board:post' next_post_navigation.board_url next_post_navigation.post_id %}">다음글 👉</a>
         {% else %}
             <div></div>
         {% endif %}

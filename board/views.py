@@ -15,14 +15,16 @@ from board.consts import BOARD_HOME_PATH
 from board.dtos.common_dtos import (
     BoardPost,
     DetailPost,
+    DetailPostNavigation,
     DetailPostReply,
     DetailPostRereply,
+    DetailPostSummary,
     DetailPostTag,
     HomePost,
     ImportantUrl,
     RecentBoardPostLayer,
     RecentPost,
-    TagInfo, DetailPostSummary,
+    TagInfo,
 )
 from board.dtos.request_dtos import (
     BoardPostsRequest,
@@ -311,7 +313,7 @@ def get_tagged_posts(request, tag_name):
 def post_detail(request, board_url, pk):
     active_filtered_posts = get_active_filtered_posts(board_urls=[board_url])
 
-    prev_post = active_filtered_posts.filter(id__lt=pk).first()
+    prev_post = active_filtered_posts.filter(id__lt=pk).last()
     next_post = active_filtered_posts.filter(id__gt=pk).order_by('id').first()
 
     post = get_object_or_404(active_filtered_posts.select_related('author'), pk=pk)
@@ -353,9 +355,15 @@ def post_detail(request, board_url, pk):
         'post_summary': DetailPostSummary(
             status=post_summary.status,
             body=post_summary.body,
-        ),
-        'prev_post': prev_post,
-        'next_post': next_post,
+        ) if post_summary else None,
+        'prev_post_navigation': DetailPostNavigation(
+            post_id=prev_post.id,
+            board_url=prev_post.board.url,
+        ) if prev_post else None,
+        'next_post_navigation': DetailPostNavigation(
+            post_id=next_post.id,
+            board_url=next_post.board.url,
+        ) if next_post else None,
         'important_urls': [
             ImportantUrl(url=url_important.url)
             for url_important in get_url_importants(post.id)
