@@ -310,7 +310,7 @@ def get_tagged_posts(request, tag_name):
 
 
 # 자세한 글 보기
-def post_detail(request, board_url, pk):
+def post_detail(request, board_url: str, pk: int):
     active_filtered_posts = get_active_filtered_posts(board_urls=[board_url])
 
     prev_post = active_filtered_posts.filter(id__lt=pk).last()
