@@ -35,7 +35,7 @@ from board.dtos.response_dtos import (
     BoardSetBoardInfo,
     BoardSetGroupResponse,
     BoardPostsResponse,
-    BoardDetailInfo,
+    BoardDetailInfo, PostDetailResponse,
 )
 from board.models import (
     Board,
@@ -322,87 +322,90 @@ def post_detail(request, board_url: str, pk: int):
     replies = get_replys_by_post_id(post.id).select_related('author__provider')
     rereplies_by_reply_ids = get_value_rereplies_key_rereply_reply_ids_by_post_id(post.id)
 
-    context = {
-        'is_liked': bool(get_liked_post_ids_by_author_id(request.user.id, [post.id])),
-        'recent_board_post_layer': RecentBoardPostLayer(
-            board_url=board_url,
-            board_name=post.board.name,
-            posts=[
-                RecentPost(
-                    id=recent_post.id,
-                    title=recent_post.title,
-                    reply_count=recent_post.reply_count + recent_post.rereply_count,
-                )
-                for recent_post in active_filtered_posts.order_by('-id')[:5]
+    return render(
+        request,
+        'board/post.html',
+        PostDetailResponse(
+            is_liked=bool(get_liked_post_ids_by_author_id(request.user.id, [post.id])),
+            recent_board_post_layer=RecentBoardPostLayer(
+                board_url=board_url,
+                board_name=post.board.name,
+                posts=[
+                    RecentPost(
+                        id=recent_post.id,
+                        title=recent_post.title,
+                        reply_count=recent_post.reply_count + recent_post.rereply_count,
+                    )
+                    for recent_post in active_filtered_posts.order_by('-id')[:5]
+                ],
+            ),
+            post=DetailPost(
+                id=post.id,
+                board_url=post.board.url,
+                board_name=post.board.name,
+                board_info=post.board.info,
+                author_nickname=post.author.nickname,
+                title=post.title,
+                simple_body=post.short_body(),
+                body=mark_safe(post.body),
+                main_image_url=(
+                    post.post_img.url if post.post_img else None
+                ),
+                like_count=post.like_count,
+                reply_count=post.reply_count + post.rereply_count,
+                created_at=post.created_at.strftime('%Y-%m-%d'),
+            ),
+            post_summary=DetailPostSummary(
+                status=post_summary.status,
+                body=post_summary.body,
+            ) if post_summary else None,
+            prev_post_navigation=DetailPostNavigation(
+                post_id=prev_post.id,
+                board_url=prev_post.board.url,
+            ) if prev_post else None,
+            next_post_navigation=DetailPostNavigation(
+                post_id=next_post.id,
+                board_url=next_post.board.url,
+            ) if next_post else None,
+            important_urls=[
+                ImportantUrl(url=url_important.url)
+                for url_important in get_url_importants(post.id)
+            ],
+            tags=[
+                DetailPostTag(name=tag.tag_name)
+                for tag in get_tags_by_post_id(post.id)
+            ],
+            replies=[
+                DetailPostReply(
+                    id=reply.id,
+                    body=reply.body,
+                    author_id=reply.author_id,
+                    author_image_url=(
+                        reply.author.user_img.url
+                        if reply.author.user_img else None
+                    ),
+                    author_nickname=reply.author.nickname,
+                    author_provider_name=reply.author.provider and reply.author.provider.provider_name,
+                    created_at=reply.created_at.strftime('%Y-%m-%d'),
+                    rereplies=[
+                        DetailPostRereply(
+                            id=rereply.id,
+                            body=rereply.body,
+                            author_id=rereply.author_id,
+                            author_image_url=(
+                                rereply.author.user_img.url
+                                if rereply.author.user_img else None
+                            ),
+                            author_nickname=rereply.author.nickname,
+                            author_provider_name=rereply.author.provider and rereply.author.provider.provider_name,
+                            created_at=rereply.created_at.strftime('%Y-%m-%d'),
+                        )
+                        for rereply in rereplies_by_reply_ids[reply.id]
+                    ]
+                ) for reply in replies
             ],
         ).model_dump(),
-        'post': DetailPost(
-            id=post.id,
-            board_url=post.board.url,
-            board_name=post.board.name,
-            board_info=post.board.info,
-            author_nickname=post.author.nickname,
-            title=post.title,
-            simple_body=post.short_body(),
-            body=mark_safe(post.body),
-            main_image_url=(
-                post.post_img.url if post.post_img else None
-            ),
-            like_count=post.like_count,
-            reply_count=post.reply_count + post.rereply_count,
-            created_at=post.created_at.strftime('%Y-%m-%d'),
-        ),
-        'post_summary': DetailPostSummary(
-            status=post_summary.status,
-            body=post_summary.body,
-        ) if post_summary else None,
-        'prev_post_navigation': DetailPostNavigation(
-            post_id=prev_post.id,
-            board_url=prev_post.board.url,
-        ) if prev_post else None,
-        'next_post_navigation': DetailPostNavigation(
-            post_id=next_post.id,
-            board_url=next_post.board.url,
-        ) if next_post else None,
-        'important_urls': [
-            ImportantUrl(url=url_important.url)
-            for url_important in get_url_importants(post.id)
-        ],
-        'tags': [
-            DetailPostTag(name=tag.tag_name)
-            for tag in get_tags_by_post_id(post.id)
-        ],
-        'replies': [
-            DetailPostReply(
-                id=reply.id,
-                body=reply.body,
-                author_id=reply.author_id,
-                author_image_url=(
-                    reply.author.user_img.url
-                    if reply.author.user_img else None
-                ),
-                author_nickname=reply.author.nickname,
-                author_provider_name=reply.author.provider and reply.author.provider.provider_name,
-                created_at=reply.created_at.strftime('%Y-%m-%d'),
-                rereplies=[
-                    DetailPostRereply(
-                        id=rereply.id,
-                        body=rereply.body,
-                        author_id=rereply.author_id,
-                        author_image_url=(
-                            rereply.author.user_img.url
-                            if rereply.author.user_img else None
-                        ),
-                        author_nickname=rereply.author.nickname,
-                        author_provider_name=rereply.author.provider and rereply.author.provider.provider_name,
-                        created_at=rereply.created_at.strftime('%Y-%m-%d'),
-                    )
-                    for rereply in rereplies_by_reply_ids[reply.id]
-                ]
-            ) for reply in replies
-        ],
-    }
-    return render(request, 'board/post.html', context)
+    )
 
 
 # 댓글 작성
