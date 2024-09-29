@@ -19,6 +19,7 @@ from board.services import (
     get_active_posts,
     get_board_paged_posts,
     get_boards_by_board_group_id,
+    get_liked_post_ids_by_author_id,
     get_tags,
     get_tags_active_post_count,
     request_n8n_webhook,
@@ -647,3 +648,80 @@ class RequestN8nWebhookTest(TestCase):
             },
             timeout=5,
         )
+
+
+class GetLikedPostIdsByAuthorIdTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='test_user',
+            password='test_password',
+        )
+        # Create Boards
+        self.django_board = Board.objects.create(
+            url='django',
+            name='django',
+        )
+        self.spring_board = Board.objects.create(
+            url='spring',
+            name='spring',
+        )
+        # Create Posts
+        self.active_django_post = Post.objects.create(
+            title='Active Django post',
+            board=self.django_board,
+            is_active=True,
+            author=self.user,
+        )
+        self.active_spring_post = Post.objects.create(
+            title='Active Spring post',
+            board=self.spring_board,
+            is_active=True,
+            author=self.user,
+        )
+        self.posts = [self.active_django_post, self.active_spring_post]
+
+    def test_with_valid_author(self):
+        # Given: 존재하는 author_id와 post_ids 리스트를 설정합니다.
+        post_ids = [post.id for post in self.posts]
+        # And: author_id가 좋아요를 누른 게시글을 설정합니다.
+        Like.objects.create(post=self.active_django_post, author=self.user)
+        Like.objects.create(post=self.active_spring_post, author=self.user)
+        self.liked_posts = [self.active_django_post, self.active_spring_post]
+
+        # When: 작성자가 좋아요를 누른 게시글의 ID들을 조회합니다.
+        result = get_liked_post_ids_by_author_id(self.user.id, post_ids)
+
+        # Then: 좋아요한 게시물의 ID만 포함된 집합을 반환해야 합니다.
+        expected_ids = {post.id for post in self.liked_posts}
+        self.assertEqual(result, expected_ids)
+
+    def test_with_valid_author_and_no_liked_posts(self):
+        # Given: 존재하는 author_id와 post_ids 리스트를 설정합니다.
+        post_ids = [post.id for post in self.posts]
+
+        # When: 작성자가 좋아요를 누른 게시글의 ID들을 조회합니다.
+        result = get_liked_post_ids_by_author_id(self.user.id, post_ids)
+
+        # Then: 좋아요한 게시물이 없습니다.
+        self.assertEqual(result, set())
+
+    def test_with_empty_post_ids(self):
+        # Given: 빈 post_ids 리스트를 설정합니다.
+        post_ids = []
+
+        # When: 작성자가 좋아요를 누른 게시글의 ID들을 조회합니다.
+        result = get_liked_post_ids_by_author_id(self.user.id, post_ids)
+
+        # Then: 빈 집합을 반환해야 합니다.
+        self.assertEqual(result, set())
+
+    def test_with_none_author(self):
+        # Given: None인 author_id와 유효한 post_ids 리스트를 설정합니다.
+        post_ids = [post.id for post in self.posts]
+
+        # When: None인 author_id에 대한 좋아요 게시글 ID들을 조회합니다.
+        result = get_liked_post_ids_by_author_id(None, post_ids)
+
+        # Then: 빈 집합을 반환해야 합니다.
+        self.assertEqual(result, set())

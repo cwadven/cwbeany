@@ -2,6 +2,8 @@ import requests
 from typing import (
     Dict,
     List,
+    Optional,
+    Set,
     Union,
 )
 
@@ -136,3 +138,21 @@ def request_n8n_webhook(board_url, post_id) -> None:
         )
     except requests.Timeout:
         pass
+
+
+def get_liked_post_ids_by_author_id(author_id: Optional[int], post_ids: List[int]) -> Set[int]:
+    if not author_id:
+        return set()
+
+    if not post_ids:
+        return set()
+
+    return set(
+        Like.objects.filter(
+            author_id=author_id,
+            post_id__in=post_ids,
+        ).values_list(
+            'post_id',
+            flat=True,
+        )
+    )
