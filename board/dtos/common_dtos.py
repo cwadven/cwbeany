@@ -53,7 +53,7 @@ class DetailPostTag(BaseModel):
 class DetailPostRereply(BaseModel):
     id: int = Field(..., description='대댓글 ID')
     body: str = Field(..., description='대댓글 본문')
-    author_id: str = Field(..., description='작성자 ID')
+    author_id: int = Field(..., description='작성자 ID')
     author_image_url: Optional[str] = Field(..., description='작성자 프로필 사진')
     author_nickname: Optional[str] = Field(..., description='작성자 닉네임')
     author_provider_name: Optional[str] = Field(..., description='작성자 소셜 로그인 제공자 이름')
@@ -63,7 +63,7 @@ class DetailPostRereply(BaseModel):
 class DetailPostReply(BaseModel):
     id: int = Field(..., description='댓글 ID')
     body: str = Field(..., description='댓글 본문')
-    author_id: str = Field(..., description='작성자 ID')
+    author_id: int = Field(..., description='작성자 ID')
     author_image_url: Optional[str] = Field(..., description='작성자 프로필 사진')
     author_nickname: Optional[str] = Field(..., description='작성자 닉네임')
     author_provider_name: Optional[str] = Field(..., description='작성자 소셜 로그인 제공자 이름')
