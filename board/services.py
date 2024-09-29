@@ -137,7 +137,7 @@ def request_n8n_webhook(board_url, post_id) -> None:
             },
             timeout=5,
         )
-    except requests.Timeout:
+    except requests.RequestException:
         pass
 
 
