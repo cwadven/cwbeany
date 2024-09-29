@@ -11,7 +11,8 @@ from pydantic import (
 from board.dtos.common_dtos import (
     BoardPost,
     HomePost,
-    TagInfo,
+    TagInfo, RecentBoardPostLayer, DetailPost, DetailPostSummary, DetailPostNavigation, ImportantUrl, DetailPostTag,
+    DetailPostReply,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
 from control.dtos.common_dtos import AnnounceInfo
@@ -97,3 +98,15 @@ class BoardPostsResponse(BaseModel):
         default_factory=list,
         description='페이지 범위',
     )
+
+
+class PostDetailResponse(BaseModel):
+    is_liked: bool = Field(..., description='좋아요 여부')
+    recent_board_post_layer: RecentBoardPostLayer = Field(..., description='최근 게시물 목록')
+    post: DetailPost = Field(..., description='게시글 정보')
+    post_summary: Optional[DetailPostSummary] = Field(..., description='게시글 요약 정보')
+    prev_post_navigation: Optional[DetailPostNavigation] = Field(..., description='이전 게시글 정보')
+    next_post_navigation: Optional[DetailPostNavigation] = Field(..., description='다음 게시글 정보')
+    important_urls: List[ImportantUrl] = Field(default_factory=list, description='중요 URL 목록')
+    tags: List[DetailPostTag] = Field(default_factory=list, description='태그 목록 정보')
+    replies: List[DetailPostReply] = Field(default_factory=list, description='댓글 목록')
