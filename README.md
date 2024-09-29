@@ -139,3 +139,10 @@ Project Root
 [edit . 2024-05-04]
 
 ![img.png](https://github.com/cwadven/cwbeany/blob/master/docs/erd/erd.png?raw=true)
+
+
+## Celery Command
+
+```shell
+celery -A config worker -l INFO -P solo
+```
