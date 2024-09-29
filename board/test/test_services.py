@@ -13,6 +13,7 @@ from board.models import (
     Reply,
     Rereply,
     Tag,
+    UrlImportant,
 )
 from board.services import (
     get_active_filtered_posts,
@@ -22,6 +23,7 @@ from board.services import (
     get_liked_post_ids_by_author_id,
     get_tags,
     get_tags_active_post_count,
+    get_url_importants,
     request_n8n_webhook,
     update_post_like_count,
     update_post_reply_count,
@@ -725,3 +727,46 @@ class GetLikedPostIdsByAuthorIdTests(TestCase):
 
         # Then: 빈 집합을 반환해야 합니다.
         self.assertEqual(result, set())
+
+
+class GetUrlImportantsTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='test_user',
+            password='test_password',
+        )
+        # Create Boards
+        self.django_board = Board.objects.create(
+            url='django',
+            name='django',
+        )
+        # Create Posts
+        self.active_django_post = Post.objects.create(
+            title='Active Django post',
+            board=self.django_board,
+            is_active=True,
+            author=self.user,
+        )
+
+    def test_get_url_importants(self):
+        # Given: UrlImportant
+        self.url_important_1 = UrlImportant.objects.create(
+            post=self.active_django_post,
+            author=self.user,
+            url='http://example.com1',
+        )
+        self.url_important_2 = UrlImportant.objects.create(
+            post=self.active_django_post,
+            author=self.user,
+            url='http://example.com2',
+        )
+
+        # When: get_url_importants 함수를 호출합니다.
+        url_importants = get_url_importants(self.active_django_post.id)
+
+        # Then: UrlImportant 모델의 전체 데이터를 반환합니다.
+        self.assertEqual(len(url_importants), 2)
+        self.assertEqual(
+            {url_important.id for url_important in url_importants},
+            {self.url_important_1.id, self.url_important_2.id},
+        )

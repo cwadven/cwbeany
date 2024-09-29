@@ -20,6 +20,7 @@ from board.models import (
     Reply,
     Rereply,
     Tag,
+    UrlImportant,
 )
 from common.common_utils.paginator_utils import web_paging
 
@@ -154,5 +155,13 @@ def get_liked_post_ids_by_author_id(author_id: Optional[int], post_ids: List[int
         ).values_list(
             'post_id',
             flat=True,
+        )
+    )
+
+
+def get_url_importants(post_id: int) -> List[UrlImportant]:
+    return list(
+        UrlImportant.objects.filter(
+            post_id=post_id,
         )
     )
