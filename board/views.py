@@ -13,6 +13,8 @@ from django.templatetags.static import static
 from board.consts import BOARD_HOME_PATH
 from board.dtos.common_dtos import (
     BoardPost,
+    DetailPostReply,
+    DetailPostRereply,
     DetailPostTag,
     HomePost,
     ImportantUrl,
@@ -52,9 +54,14 @@ from board.services import (
     update_post_like_count,
     update_post_reply_count,
     update_post_rereply_count,
+    get_replys_by_post_id,
+    get_value_rereplies_key_rereply_reply_ids_by_post_id,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
-from chatgpt.services import get_lessons, get_latest_post_summary_by_post_id
+from chatgpt.services import (
+    get_latest_post_summary_by_post_id,
+    get_lessons,
+)
 from control.dtos.common_dtos import AnnounceInfo
 from control.services import get_announces
 
@@ -308,6 +315,9 @@ def post_detail(request, board_url, pk):
     post = get_object_or_404(active_filtered_posts, pk=pk)
     post_summary = get_latest_post_summary_by_post_id(post.id)
 
+    replies = get_replys_by_post_id(post.id).select_related('author__provider')
+    rereplies_by_reply_ids = get_value_rereplies_key_rereply_reply_ids_by_post_id(post.id)
+
     context = {
         'is_liked': bool(get_liked_post_ids_by_author_id(request.user.id, [post.id])),
         'recent_board_post_layer': RecentBoardPostLayer(
@@ -334,8 +344,36 @@ def post_detail(request, board_url, pk):
             DetailPostTag(name=tag.tag_name)
             for tag in get_tags_by_post_id(post.id)
         ],
+        'replies': [
+            DetailPostReply(
+                id=reply.id,
+                body=reply.body,
+                author_id=reply.author_id,
+                author_image_url=(
+                    reply.author.user_img.url
+                    if reply.author.user_img else None
+                ),
+                author_nickname=reply.author.nickname,
+                author_provider_name=reply.author.provider and reply.author.provider.provider_name,
+                created_at=reply.created_at.strftime('%Y-%m-%d'),
+                rereplies=[
+                    DetailPostRereply(
+                        id=rereply.id,
+                        body=rereply.body,
+                        author_id=rereply.author_id,
+                        author_image_url=(
+                            rereply.author.user_img.url
+                            if rereply.author.user_img else None
+                        ),
+                        author_nickname=rereply.author.nickname,
+                        author_provider_name=rereply.author.provider and rereply.author.provider.provider_name,
+                        created_at=rereply.created_at.strftime('%Y-%m-%d'),
+                    )
+                    for rereply in rereplies_by_reply_ids[reply.id]
+                ]
+            ) for reply in replies
+        ],
     }
-
     return render(request, 'board/post.html', context)
 
 

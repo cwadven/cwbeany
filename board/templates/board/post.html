@@ -399,13 +399,13 @@
         <!-- 댓글 + 대댓글 -->
         <div class="mb-2">
             <!-- 댓글 -->
-            {% for reply in post.replys.all %}
+            {% for reply in replies %}
                 <div class="card mb-3 py-2">
                     <div id="reply_{{ reply.id }}" class="row g-0">
                         <div class="text-end pe-2">
                             {% if user.is_authenticated %}
                                 <i class="reply_call bi bi-reply-fill"></i>
-                                {% if request.user == reply.author or request.user.is_superuser %}
+                                {% if request.user.id == reply.author_id or request.user.is_superuser %}
                                     <i class="reply_del bi bi-trash-fill"></i>
                                 {% endif %}
                             {% endif %}
@@ -413,45 +413,43 @@
                         <div class="d-flex mx-2">
                             <div class="align-self-center text-center"
                                  style="display: flex;flex-direction: column;justify-content: center;align-items: center;">
-                                {% if reply.author.user_img %}
+                                {% if reply.author_image_url %}
                                     <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                         src="{{ reply.author.user_img.url }}" alt="{{ reply.author.nickname }}">
+                                         src="{{ reply.author_image_url }}" alt="{{ reply.author_nickname }}">
                                 {% else %}
-                                    {% if reply.author.provider %}
-                                        {% if reply.author.provider.name == 'naver' %}
-                                        <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                             src="{% static 'naver_icon.png' %}" alt="{{ reply.author.nickname }}">
-                                        {% elif reply.author.provider.name == 'google' %}
-                                        <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                         src="{% static 'google_icon.png' %}" alt="{{ reply.author.nickname }}">
-                                        {% elif reply.author.provider.name == 'kakao' %}
-                                        <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                         src="{% static 'kakao_icon.png' %}" alt="{{ reply.author.nickname }}">
-                                        {% elif reply.author.provider.name == 'github' %}
-                                        <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                         src="{% static 'github_icon.png' %}" alt="{{ reply.author.nickname }}">
-                                        {% endif %}
+                                    {% if reply.author_provider_name == 'naver' %}
+                                    <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
+                                         src="{% static 'naver_icon.png' %}" alt="{{ reply.author_nickname }}">
+                                    {% elif reply.author_provider_name == 'google' %}
+                                    <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
+                                     src="{% static 'google_icon.png' %}" alt="{{ reply.author_nickname }}">
+                                    {% elif reply.author_provider_name == 'kakao' %}
+                                    <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
+                                     src="{% static 'kakao_icon.png' %}" alt="{{ reply.author_nickname }}">
+                                    {% elif reply.author_provider_name == 'github' %}
+                                    <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
+                                     src="{% static 'github_icon.png' %}" alt="{{ reply.author_nickname }}">
                                     {% else %}
-                                        <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                         src="{% static 'logo.ico' %}" alt="{{ reply.author.nickname }}">
+                                    <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
+                                     src="{% static 'logo.ico' %}" alt="{{ reply.author_nickname }}">
                                     {% endif %}
                                 {% endif %}
-                                <div>{{ reply.author.nickname }}</div>
+                                <div>{{ reply.author_nickname }}</div>
                             </div>
                             <div style="overflow-wrap: anywhere; margin-left: 5px;">
                                 <div class="p-1">
                                     <div class="card-text mb-1 ps-1 pe-3">{{ reply.body }}</div>
                                     <div class="card-text"><small
-                                            class="text-muted">{{ reply.created_at|date:'Y-m-d' }}</small></div>
+                                            class="text-muted">{{ reply.created_at }}</small></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {% for rereply in reply.rereplys.all %}
+                    {% for rereply in reply.rereplies %}
                         <div id="rereply_{{ rereply.id }}" class="row g-0 mt-3">
                             <div class="text-end pe-2">
                                 {% if user.is_authenticated %}
-                                    {% if request.user == rereply.author or request.user.is_superuser %}
+                                    {% if request.user.id == rereply.author_id or request.user.is_superuser %}
                                         <i id="rereply_{{ rereply.id }}" class="rereply_del bi bi-trash-fill"></i>
                                     {% endif %}
                                 {% endif %}
@@ -460,36 +458,34 @@
                                 <div class="align-self-center text-center me-2"><i class="bi bi-arrow-return-right"></i>
                                 </div>
                                 <div class="align-self-center text-center">
-                                    {% if rereply.author.user_img %}
+                                    {% if rereply.author_image_url %}
                                         <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                             src="{{ rereply.author.user_img.url }}" alt="{{ rereply.author.nickname }}">
+                                             src="{{ rereply.author_image_url }}" alt="{{ rereply.author_nickname }}">
                                     {% else %}
-                                        {% if rereply.author.provider %}
-                                            {% if rereply.author.provider.name == 'naver' %}
-                                            <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                                 src="{% static 'naver_icon.png' %}" alt="{{ rereply.author.nickname }}">
-                                            {% elif rereply.author.provider.name == 'google' %}
-                                            <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                             src="{% static 'google_icon.png' %}" alt="{{ rereply.author.nickname }}">
-                                            {% elif rereply.author.provider.name == 'kakao' %}
-                                            <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                             src="{% static 'kakao_icon.png' %}" alt="{{ rereply.author.nickname }}">
-                                            {% elif rereply.author.provider.name == 'github' %}
-                                            <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                             src="{% static 'github_icon.png' %}" alt="{{ rereply.author.nickname }}">
-                                            {% endif %}
+                                        {% if rereply.author_provider_name == 'naver' %}
+                                        <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
+                                             src="{% static 'naver_icon.png' %}" alt="{{ rereply.author_nickname }}">
+                                        {% elif rereply.author_provider_name == 'google' %}
+                                        <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
+                                         src="{% static 'google_icon.png' %}" alt="{{ rereply.author_nickname }}">
+                                        {% elif rereply.author_provider_name == 'kakao' %}
+                                        <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
+                                         src="{% static 'kakao_icon.png' %}" alt="{{ rereply.author_nickname }}">
+                                        {% elif rereply.author_provider_name == 'github' %}
+                                        <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
+                                         src="{% static 'github_icon.png' %}" alt="{{ rereply.author_nickname }}">
                                         {% else %}
                                             <img class="img-thumbnail align-middle" style="max-width:70px;max-height: 70px;"
-                                             src="{% static 'logo.ico' %}" alt="{{ rereply.author.nickname }}">
+                                             src="{% static 'logo.ico' %}" alt="{{ rereply.author_nickname }}">
                                         {% endif %}
                                     {% endif %}
-                                    <div>{{ rereply.author.nickname }}</div>
+                                    <div>{{ rereply.author_nickname }}</div>
                                 </div>
                                 <div style="overflow-wrap: anywhere; margin-left: 5px;">
                                     <div class="p-1">
                                         <div class="card-text mb-1 ps-1 pe-3">{{ rereply.body }}</div>
                                         <div class="card-text"><small
-                                                class="text-muted">{{ rereply.created_at|date:'Y-m-d' }}</small></div>
+                                                class="text-muted">{{ rereply.created_at }}</small></div>
                                     </div>
                                 </div>
                             </div>
