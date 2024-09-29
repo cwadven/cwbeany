@@ -43,7 +43,7 @@ from board.services import (
     get_tags_active_post_count,
     update_post_like_count,
     update_post_reply_count,
-    update_post_rereply_count,
+    update_post_rereply_count, get_liked_post_ids_by_author_id,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
 from chatgpt.services import get_lessons, get_latest_post_summary_by_post_id
@@ -306,13 +306,8 @@ def post_detail(request, board_url, pk):
     post = get_object_or_404(qs, board__url=board_url, pk=pk)
     post_summary = get_latest_post_summary_by_post_id(post.id)
 
-    if request.user.is_authenticated:
-        like_check = Like.objects.filter(author=request.user, post=post).exists()
-    else:
-        like_check = False
-
     context = {
-        'like_check': like_check,
+        'is_liked': bool(get_liked_post_ids_by_author_id(request.user.id, [post.id])),
         'qs': qs,
         'post': post,
         'post_summary': post_summary,

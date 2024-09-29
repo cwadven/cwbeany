@@ -352,7 +352,7 @@
     <div class="text-center my-3">
         <a id="like" href="{% url 'board:like' post.board.url post.id %}"
            class="d-inline text-center border p-2 rounded text-decoration-none text-dark fw-bolder">
-            {% if like_check %}
+            {% if is_liked %}
                 <i class="bi bi-heart-fill text-danger"></i>
             {% else %}
                 <i class="bi bi-heart text-danger"></i>
