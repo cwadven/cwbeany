@@ -15,6 +15,8 @@ from board.dtos.common_dtos import (
     HomePost,
     TagInfo,
     BoardPost,
+    RecentBoardPostLayer,
+    RecentPost,
 )
 from board.dtos.request_dtos import (
     BoardPostsRequest,
@@ -36,14 +38,16 @@ from board.models import (
     Tag,
 )
 from board.services import (
+    get_active_filtered_posts,
     get_active_posts,
     get_board_paged_posts,
     get_boards_by_board_group_id,
+    get_liked_post_ids_by_author_id,
     get_tags,
     get_tags_active_post_count,
     update_post_like_count,
     update_post_reply_count,
-    update_post_rereply_count, get_liked_post_ids_by_author_id,
+    update_post_rereply_count,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
 from chatgpt.services import get_lessons, get_latest_post_summary_by_post_id
@@ -292,23 +296,28 @@ def get_tagged_posts(request, tag_name):
 
 # 자세한 글 보기
 def post_detail(request, board_url, pk):
-    qs = Post.objects.active().filter(
-        board__url=board_url
-    ).select_related(
-        'board'
-    ).order_by(
-        '-id'
-    )
+    active_filtered_posts = get_active_filtered_posts(board_urls=[board_url])
 
-    prev_post = qs.filter(id__lt=pk).first()
-    next_post = qs.filter(id__gt=pk).order_by('id').first()
+    prev_post = active_filtered_posts.filter(id__lt=pk).first()
+    next_post = active_filtered_posts.filter(id__gt=pk).order_by('id').first()
 
-    post = get_object_or_404(qs, board__url=board_url, pk=pk)
+    post = get_object_or_404(active_filtered_posts, pk=pk)
     post_summary = get_latest_post_summary_by_post_id(post.id)
 
     context = {
         'is_liked': bool(get_liked_post_ids_by_author_id(request.user.id, [post.id])),
-        'qs': qs,
+        'recent_board_post_layer': RecentBoardPostLayer(
+            board_url=board_url,
+            board_name=post.board.name,
+            posts=[
+                RecentPost(
+                    id=recent_post.id,
+                    title=recent_post.title,
+                    reply_count=recent_post.reply_count,
+                )
+                for recent_post in active_filtered_posts.order_by('-id')[:5]
+            ],
+        ).model_dump(),
         'post': post,
         'post_summary': post_summary,
         'prev_post': prev_post,
