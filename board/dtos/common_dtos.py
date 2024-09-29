@@ -40,3 +40,7 @@ class RecentBoardPostLayer(BaseModel):
         default_factory=list,
         description='게시판의 최근 게시물 목록',
     )
+
+
+class ImportantUrl(BaseModel):
+    url: str = Field(..., description='URL')
