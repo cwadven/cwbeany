@@ -179,13 +179,13 @@ def get_tags_by_post_id(post_id: int) -> List[Tag]:
     )
 
 
-def get_replys_by_post_id(post_id: int) -> List[Reply]:
+def get_replys_by_post_id(post_id: int) -> QuerySet[Reply]:
     return Reply.objects.filter(
         post_id=post_id,
     )
 
 
-def get_rereplys_by_post_id(post_id: int) -> List[Rereply]:
+def get_rereplys_by_post_id(post_id: int) -> QuerySet[Rereply]:
     return Rereply.objects.filter(
         post_id=post_id,
     )
