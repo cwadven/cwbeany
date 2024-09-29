@@ -337,10 +337,12 @@
     </div>
     <!-- 강조 url -->
     <div class="my-3">
-        {% if post.urlimportants.exists %}
+        {% if important_urls %}
             <div class="fw-bolder">URL</div>
-            {% for urlimportant in post.urlimportants.all %}
-                <a href="{{ urlimportant.url }}">{{ urlimportant.url }}</a>
+            {% for important_url in important_urls %}
+                <div>
+                    <a href="{{ important_url.url }}">{{ important_url.url }}</a>
+                </div>
             {% endfor %}
         {% endif %}
     </div>
