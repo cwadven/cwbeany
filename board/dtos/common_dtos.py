@@ -78,6 +78,7 @@ class DetailPost(BaseModel):
     id: int = Field(..., description='게시글 ID')
     board_url: Optional[str] = Field(..., description='게시판 URL')
     board_name: Optional[str] = Field(..., description='게시판 이름')
+    board_info: Optional[str] = Field(..., description='게시판 정보')
     author_nickname: Optional[str] = Field(..., description='작성자 닉네임')
     title: str = Field(..., description='제목')
     simple_body: str = Field(..., description='본문의 앞부분 100자')
