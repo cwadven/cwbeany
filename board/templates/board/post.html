@@ -375,11 +375,11 @@
             <div></div>
         {% endif %}
     </div>
-    <!-- 태그 -->
     <div class="extra-info">
         <div class="mb-2">
-            {% for tag in post.tag_set.all %}
-                <a href="{% url 'board:get_tagged_posts' tag.tag_name %}" class="text-decoration-none">#{{ tag.tag_name }}</a>
+        <!-- 태그 -->
+            {% for tag in tags %}
+                <a href="{% url 'board:get_tagged_posts' tag.name %}" class="text-decoration-none">#{{ tag.name }}</a>
             {% endfor %}
         </div>
         <!-- 댓글 작성 -->

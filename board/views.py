@@ -16,7 +16,7 @@ from board.dtos.common_dtos import (
     TagInfo,
     BoardPost,
     RecentBoardPostLayer,
-    RecentPost, ImportantUrl,
+    RecentPost, ImportantUrl, DetailPostTag,
 )
 from board.dtos.request_dtos import (
     BoardPostsRequest,
@@ -47,7 +47,7 @@ from board.services import (
     get_tags_active_post_count,
     update_post_like_count,
     update_post_reply_count,
-    update_post_rereply_count, get_url_importants,
+    update_post_rereply_count, get_url_importants, get_tags_by_post_id,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
 from chatgpt.services import get_lessons, get_latest_post_summary_by_post_id
@@ -325,6 +325,10 @@ def post_detail(request, board_url, pk):
         'important_urls': [
             ImportantUrl(url=url_important.url)
             for url_important in get_url_importants(post.id)
+        ],
+        'tags': [
+            DetailPostTag(name=tag.tag_name)
+            for tag in get_tags_by_post_id(post.id)
         ],
     }
 
