@@ -165,3 +165,15 @@ def get_url_importants(post_id: int) -> List[UrlImportant]:
             post_id=post_id,
         )
     )
+
+
+def get_tags_by_post_id(post_id: int) -> List[Tag]:
+    qs = Post.tag_set.through.objects.select_related(
+        'tag',
+    ).filter(
+        post_id=post_id,
+    )
+    return list(
+        q.tag
+        for q in qs
+    )

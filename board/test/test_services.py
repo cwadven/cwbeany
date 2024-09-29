@@ -23,6 +23,7 @@ from board.services import (
     get_liked_post_ids_by_author_id,
     get_tags,
     get_tags_active_post_count,
+    get_tags_by_post_id,
     get_url_importants,
     request_n8n_webhook,
     update_post_like_count,
@@ -779,3 +780,60 @@ class GetUrlImportantsTest(TestCase):
         # Then: UrlImportant 모델의 전체 데이터를 반환합니다.
         self.assertEqual(len(url_importants), 0)
         self.assertEqual(url_importants, [])
+
+
+class GetTagsByPostIdTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='test_user',
+            password='test_password',
+        )
+        # Create Boards
+        self.django_board = Board.objects.create(
+            url='django',
+            name='django',
+        )
+        self.spring_board = Board.objects.create(
+            url='spring',
+            name='spring',
+        )
+        # Create Posts
+        self.active_django_post = Post.objects.create(
+            title='Active Django post',
+            board=self.django_board,
+            is_active=True,
+            author=self.user,
+        )
+        # Create Tags
+        self.python_tag = Tag.objects.create(tag_name='python')
+        self.django_tag = Tag.objects.create(tag_name='java')
+
+    def test_should_return_tags(self):
+        # Given: Add tags to posts
+        self.active_django_post.tag_set.add(self.python_tag)
+        self.active_django_post.tag_set.add(self.django_tag)
+
+        # When: get_tags_by_post_id 함수를 호출합니다.
+        tags = get_tags_by_post_id(self.active_django_post.id)
+
+        # Then: tags 모델의 전체 데이터를 반환합니다.
+        self.assertEqual(len(tags), 2)
+        # And: tag_id를 반환
+        self.assertEqual(
+            {tag.id for tag in tags},
+            {self.python_tag.id, self.django_tag.id},
+        )
+        # And: tag_name을 반환
+        self.assertEqual(
+            {tag.tag_name for tag in tags},
+            {self.python_tag.tag_name, self.django_tag.tag_name},
+        )
+
+    def test_should_return_empty_list_when_tag_not_exists(self):
+        # Given:
+        # When: get_tags_by_post_id 함수를 호출합니다.
+        tags = get_tags_by_post_id(self.active_django_post.id)
+
+        # Then: tags 모델의 전체 데이터를 반환합니다.
+        self.assertEqual(len(tags), 0)
+        self.assertEqual(tags, [])
