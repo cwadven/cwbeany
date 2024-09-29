@@ -12,11 +12,13 @@ from django.templatetags.static import static
 
 from board.consts import BOARD_HOME_PATH
 from board.dtos.common_dtos import (
-    HomePost,
-    TagInfo,
     BoardPost,
+    DetailPostTag,
+    HomePost,
+    ImportantUrl,
     RecentBoardPostLayer,
-    RecentPost, ImportantUrl, DetailPostTag,
+    RecentPost,
+    TagInfo,
 )
 from board.dtos.request_dtos import (
     BoardPostsRequest,
@@ -45,9 +47,11 @@ from board.services import (
     get_liked_post_ids_by_author_id,
     get_tags,
     get_tags_active_post_count,
+    get_tags_by_post_id,
+    get_url_importants,
     update_post_like_count,
     update_post_reply_count,
-    update_post_rereply_count, get_url_importants, get_tags_by_post_id,
+    update_post_rereply_count,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
 from chatgpt.services import get_lessons, get_latest_post_summary_by_post_id
