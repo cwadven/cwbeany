@@ -91,3 +91,8 @@ class DetailPost(BaseModel):
     like_count: int = Field(..., description='좋아요 수')
     reply_count: int = Field(..., description='댓글 수')
     created_at: str = Field(..., description='작성일')
+
+
+class DetailPostSummary(BaseModel):
+    status: str = Field(..., description='상태')
+    body: Optional[str] = Field(..., description='본문')
