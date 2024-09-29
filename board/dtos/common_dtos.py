@@ -44,3 +44,7 @@ class RecentBoardPostLayer(BaseModel):
 
 class ImportantUrl(BaseModel):
     url: str = Field(..., description='URL')
+
+
+class DetailPostTag(BaseModel):
+    name: str = Field(..., description='태그 이름')
