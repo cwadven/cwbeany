@@ -86,7 +86,7 @@
             const form = document.createElement("form");
             form.setAttribute("class", "rereply-form");
             form.method = "POST";
-            form.action = "{% url 'board:rereply' post.board.url '00000' %}".replace('00000', parent.id.replace('reply_', ''));
+            form.action = "{% url 'board:rereply' post.board_url '00000' %}".replace('00000', parent.id.replace('reply_', ''));
             // 쓸 곳 만들기
             const body_div = document.createElement("div");
             body_div.setAttribute("class", "form-floating");
@@ -126,11 +126,11 @@
 
         reply_delete = (e) => {
             let parent = e.currentTarget.offsetParent.children[0];
-            $(location).attr('href', "{% url 'board:reply_delete' post.board.url '00000' %}".replace('00000', parent.id.replace('reply_', '')));
+            $(location).attr('href', "{% url 'board:reply_delete' post.board_url '00000' %}".replace('00000', parent.id.replace('reply_', '')));
         }
 
         rereply_delete = (e) => {
-            $(location).attr('href', "{% url 'board:rereply_delete' post.board.url '00000' %}".replace('00000', e.target.id.replace('rereply_', '')));
+            $(location).attr('href', "{% url 'board:rereply_delete' post.board_url '00000' %}".replace('00000', e.target.id.replace('rereply_', '')));
         }
     </script>
 
@@ -290,9 +290,9 @@
 
 {% block title %}{{ post.title }}{% endblock %}
 {% block og_title %}{{ post.title }}{% endblock %}
-{% block description %}{{ post.body|striptags|slice:":100" }}{% endblock %}
+{% block description %}{{ post.simple_body }}{% endblock %}
 {% block current_url %}https://cwbeany.com{{ request.get_full_path }}{% endblock %}
-{% block img %}{% if post.post_img %}https://cwbeany.com{{ post.post_img.url }}{% else %}
+{% block img %}{% if post.main_image_url %}https://cwbeany.com{{ post.main_image_url }}{% else %}
     https://cwbeany.com/static/logo.ico{% endif %}{% endblock %}
 
 {% block middle_left %}
@@ -303,8 +303,8 @@
     <h3>{{ post.title }}</h3>
     <!-- 글 작성자 / 생성일자 -->
     <div class="mb-2 text-muted">
-        <i class="bi bi-person-circle"></i> {{ post.author.nickname }} <i
-            class="bi bi-calendar-week"></i> {{ post.created_at|date:"Y-m-d" }}
+        <i class="bi bi-person-circle"></i> {{ post.author_nickname }} <i
+            class="bi bi-calendar-week"></i> {{ post.created_at }}
     </div>
 
     {% if post_summary %}
@@ -333,7 +333,7 @@
 
     <!-- 글 body -->
     <div class="mb-2">
-        {{ post.body|safe }}
+        {{ post.body }}
     </div>
     <!-- 강조 url -->
     <div class="my-3">
@@ -352,7 +352,7 @@
             class="bi bi-chat-right-text"></i> {{ post.reply_count }}
     </div>
     <div class="text-center my-3">
-        <a id="like" href="{% url 'board:like' post.board.url post.id %}"
+        <a id="like" href="{% url 'board:like' post.board_url post.id %}"
            class="d-inline text-center border p-2 rounded text-decoration-none text-dark fw-bolder">
             {% if is_liked %}
                 <i class="bi bi-heart-fill text-danger"></i>
@@ -384,7 +384,7 @@
         </div>
         <!-- 댓글 작성 -->
         <div class="mb-3">
-            <form class="reply-form" method="POST" action="{% url 'board:reply' post.board.url post.id %}">
+            <form class="reply-form" method="POST" action="{% url 'board:reply' post.board_url post.id %}">
                 {% csrf_token %}
                 <div class="mb-2 form-floating">
                 <textarea name="reply_body" class="form-control" placeholder="댓글을 작성하세요!" id="floatingTextarea"
@@ -500,8 +500,8 @@
 {% block middle_right %}
     <!-- 게시판 소개 -->
     <div class="p-4 bg-light rounded mb-2">
-        <h5><a href="{% url 'board:get_board_posts' post.board.url %}">{{ post.board.name }}</a></h5>
-        <div>{{ post.board.info }}</div>
+        <h5><a href="{% url 'board:get_board_posts' post.board_url %}">{{ post.board_name }}</a></h5>
+        <div>{{ post.board_info }}</div>
     </div>
 
     <!-- 다른 게시판에 있는 게시글 목록 최신 -->

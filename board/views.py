@@ -8,11 +8,13 @@ from django.http import (
     HttpResponseRedirect,
 )
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.templatetags.static import static
 
 from board.consts import BOARD_HOME_PATH
 from board.dtos.common_dtos import (
     BoardPost,
+    DetailPost,
     DetailPostReply,
     DetailPostRereply,
     DetailPostTag,
@@ -312,7 +314,7 @@ def post_detail(request, board_url, pk):
     prev_post = active_filtered_posts.filter(id__lt=pk).first()
     next_post = active_filtered_posts.filter(id__gt=pk).order_by('id').first()
 
-    post = get_object_or_404(active_filtered_posts, pk=pk)
+    post = get_object_or_404(active_filtered_posts.select_related('author'), pk=pk)
     post_summary = get_latest_post_summary_by_post_id(post.id)
 
     replies = get_replys_by_post_id(post.id).select_related('author__provider')
@@ -332,7 +334,22 @@ def post_detail(request, board_url, pk):
                 for recent_post in active_filtered_posts.order_by('-id')[:5]
             ],
         ).model_dump(),
-        'post': post,
+        'post': DetailPost(
+            id=post.id,
+            board_url=post.board.url,
+            board_name=post.board.name,
+            board_info=post.board.info,
+            author_nickname=post.author.nickname,
+            title=post.title,
+            simple_body=post.short_body(),
+            body=mark_safe(post.body),
+            main_image_url=(
+                post.post_img.url if post.post_img else None
+            ),
+            like_count=post.like_count,
+            reply_count=post.reply_count + post.rereply_count,
+            created_at=post.created_at.strftime('%Y-%m-%d'),
+        ),
         'post_summary': post_summary,
         'prev_post': prev_post,
         'next_post': next_post,
