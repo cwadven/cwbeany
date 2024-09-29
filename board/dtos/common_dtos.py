@@ -2,7 +2,7 @@ from pydantic import (
     BaseModel,
     Field,
 )
-from typing import Optional
+from typing import Optional, List
 
 
 class TagInfo(BaseModel):
@@ -25,3 +25,18 @@ class BoardPost(BaseModel):
 
 class HomePost(BoardPost):
     pass
+
+
+class RecentPost(BaseModel):
+    id: int = Field(..., description='게시글 ID')
+    title: str = Field(default='', description='제목')
+    reply_count: int = Field(default=0, description='댓글 수')
+
+
+class RecentBoardPostLayer(BaseModel):
+    board_url: str = Field(..., description='게시판 URL')
+    board_name: str = Field(..., description='게시판 이름')
+    posts: Optional[List[RecentPost]] = Field(
+        default_factory=list,
+        description='게시판의 최근 게시물 목록',
+    )
