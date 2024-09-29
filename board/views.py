@@ -327,7 +327,7 @@ def post_detail(request, board_url, pk):
                 RecentPost(
                     id=recent_post.id,
                     title=recent_post.title,
-                    reply_count=recent_post.reply_count,
+                    reply_count=recent_post.reply_count + recent_post.rereply_count,
                 )
                 for recent_post in active_filtered_posts.order_by('-id')[:5]
             ],
@@ -395,6 +395,7 @@ def rereply_write(request, board_url, pk):
     reply = get_object_or_404(Reply, id=pk)
     if request.method == 'POST' and request.POST.get('rereply'):
         rereply = Rereply()
+        rereply.post = reply.post
         rereply.reply = reply
         rereply.author = request.user
         rereply.body = request.POST.get('rereply')
