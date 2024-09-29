@@ -748,7 +748,7 @@ class GetUrlImportantsTest(TestCase):
             author=self.user,
         )
 
-    def test_get_url_importants(self):
+    def test_should_return_url_important(self):
         # Given: UrlImportant
         self.url_important_1 = UrlImportant.objects.create(
             post=self.active_django_post,
@@ -770,3 +770,12 @@ class GetUrlImportantsTest(TestCase):
             {url_important.id for url_important in url_importants},
             {self.url_important_1.id, self.url_important_2.id},
         )
+
+    def test_should_return_empty_list_when_url_important_not_exists(self):
+        # Given:
+        # When: get_url_importants 함수를 호출합니다.
+        url_importants = get_url_importants(self.active_django_post.id)
+
+        # Then: UrlImportant 모델의 전체 데이터를 반환합니다.
+        self.assertEqual(len(url_importants), 0)
+        self.assertEqual(url_importants, [])
