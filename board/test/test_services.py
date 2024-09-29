@@ -21,6 +21,8 @@ from board.services import (
     get_board_paged_posts,
     get_boards_by_board_group_id,
     get_liked_post_ids_by_author_id,
+    get_replys_by_post_id,
+    get_rereplys_by_post_id,
     get_tags,
     get_tags_active_post_count,
     get_tags_by_post_id,
@@ -837,3 +839,127 @@ class GetTagsByPostIdTest(TestCase):
         # Then: tags 모델의 전체 데이터를 반환합니다.
         self.assertEqual(len(tags), 0)
         self.assertEqual(tags, [])
+
+
+class GetReplysByPostIdTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='test_user',
+            password='test_password',
+        )
+        # Create Boards
+        self.django_board = Board.objects.create(
+            url='django',
+            name='django',
+        )
+        # Create Posts
+        self.active_django_post = Post.objects.create(
+            title='Active Django post',
+            board=self.django_board,
+            is_active=True,
+            author=self.user,
+        )
+
+    def test_should_return_replys(self):
+        # Given: Add replys to posts
+        self.reply1 = Reply.objects.create(
+            body='Reply 1',
+            post=self.active_django_post,
+            author=self.user
+        )
+        self.reply2 = Reply.objects.create(
+            body='Reply 2',
+            post=self.active_django_post,
+            author=self.user
+        )
+
+        # When:
+        replys = get_replys_by_post_id(self.active_django_post.id)
+
+        # Then: replys 모델의 전체 데이터를 반환합니다.
+        self.assertEqual(len(replys), 2)
+        # And: reply_id를 반환
+        self.assertEqual(
+            {reply.id for reply in replys},
+            {self.reply1.id, self.reply2.id},
+        )
+        # And: reply_body를 반환
+        self.assertEqual(
+            {reply.body for reply in replys},
+            {self.reply1.body, self.reply2.body},
+        )
+
+    def test_should_return_empty_list_when_reply_not_exists(self):
+        # Given:
+        # When:
+        replys = get_replys_by_post_id(self.active_django_post.id)
+
+        # Then: replys
+        self.assertEqual(len(replys), 0)
+        self.assertEqual(replys, [])
+
+
+class GetRereplysByPostIdTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='test_user',
+            password='test_password',
+        )
+        # Create Boards
+        self.django_board = Board.objects.create(
+            url='django',
+            name='django',
+        )
+        # Create Posts
+        self.active_django_post = Post.objects.create(
+            title='Active Django post',
+            board=self.django_board,
+            is_active=True,
+            author=self.user,
+        )
+
+    def test_should_return_rereplys(self):
+        # Given: Add replys to posts
+        self.reply = Reply.objects.create(
+            body='Reply 1',
+            post=self.active_django_post,
+            author=self.user
+        )
+        # Given: Add rereplys to posts
+        self.rereply1 = Rereply.objects.create(
+            body='Rereply 1',
+            reply_id=self.reply.id,
+            post=self.active_django_post,
+            author=self.user,
+        )
+        self.rereply2 = Rereply.objects.create(
+            body='Rereply 2',
+            reply_id=self.reply.id,
+            post=self.active_django_post,
+            author=self.user,
+        )
+
+        # When:
+        rereplys = get_rereplys_by_post_id(self.active_django_post.id)
+
+        # Then: replys 모델의 전체 데이터를 반환합니다.
+        self.assertEqual(len(rereplys), 2)
+        # And: reply_id를 반환
+        self.assertEqual(
+            {rereply.id for rereply in rereplys},
+            {self.rereply1.id, self.rereply2.id},
+        )
+        # And: reply_body를 반환
+        self.assertEqual(
+            {rereply.body for rereply in rereplys},
+            {self.rereply1.body, self.rereply2.body},
+        )
+
+    def test_should_return_empty_list_when_rereply_not_exists(self):
+        # Given:
+        # When:
+        rereplys = get_rereplys_by_post_id(self.active_django_post.id)
+
+        # Then: replys
+        self.assertEqual(len(rereplys), 0)
+        self.assertEqual(rereplys, [])
