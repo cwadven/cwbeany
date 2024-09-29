@@ -2,7 +2,11 @@ from pydantic import (
     BaseModel,
     Field,
 )
-from typing import Optional, List
+from typing import (
+    Any,
+    List,
+    Optional,
+)
 
 
 class TagInfo(BaseModel):
@@ -82,7 +86,7 @@ class DetailPost(BaseModel):
     author_nickname: Optional[str] = Field(..., description='작성자 닉네임')
     title: str = Field(..., description='제목')
     simple_body: str = Field(..., description='본문의 앞부분 100자')
-    body: str = Field(..., description='본문 전체')
+    body: Any = Field(..., description='본문 전체')
     main_image_url: Optional[str] = Field(..., description='대표 이미지 URL')
     like_count: int = Field(..., description='좋아요 수')
     reply_count: int = Field(..., description='댓글 수')
