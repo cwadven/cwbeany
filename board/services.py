@@ -196,7 +196,7 @@ def get_rereplys_by_post_id(post_id: int) -> QuerySet[Rereply]:
 def get_value_rereplys_key_rereply_reply_ids_by_post_id(post_id: int) -> DefaultDict[int, List[Rereply]]:
     rereply_by_reply_ids = defaultdict(list)
 
-    for rereply in get_rereplys_by_post_id(post_id).select_related('author'):
+    for rereply in get_rereplys_by_post_id(post_id).select_related('author__provider'):
         rereply_by_reply_ids[rereply.reply_id].append(rereply)
 
     return rereply_by_reply_ids
