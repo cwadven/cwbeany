@@ -331,5 +331,5 @@ if not DEBUG:
         dsn=SENTRY_DNS,
         traces_sample_rate=1.0,
         profiles_sample_rate=1.0,
+        environment='production'
     )
-    environment = 'production'
