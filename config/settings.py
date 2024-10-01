@@ -8,7 +8,11 @@ from .PRIVATE_SETTING import (
     CHATGPT_KEY,
     NOTICE_EMAILS,
     WEB_HOOK_ADDRESS,
+    SENTRY_DNS,
 )
+
+import sentry_sdk
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -319,3 +323,12 @@ INTERNAL_IPS = [
 ]
 
 WEB_HOOK_ADDRESS = WEB_HOOK_ADDRESS
+
+
+if not DEBUG:
+    sentry_sdk.init(
+        dsn=SENTRY_DNS,
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
+    environment = 'production'
