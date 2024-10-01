@@ -10,10 +10,15 @@ from chatgpt.models import (
     LessonInformation,
 )
 from chatgpt.services import get_chatgpt_response
-from common.common_utils.io_utils import send_email, send_email_with_file
+from common.common_utils.io_utils import (
+    send_email,
+    send_email_with_file,
+)
 from common.consts.common_consts import (
+    BACKUP_MEDIA,
+    BACKUP_SQL,
     EMAIL_TEMPLATE_MAPPER,
-    HEALTH_CHECK, BACKUP_SQL,
+    HEALTH_CHECK,
 )
 from control.models import (
     TodayYesterday,
@@ -83,6 +88,31 @@ def database_backup():
         backup_path + '/' + backup_file_name,
     )
     print("----backup sql email sended----")
+
+
+def media_backup():
+    """
+    미디어 백업
+    """
+    backup_path = '/var/www/backup'
+    backup_file_name = f'cwbeany_blog_media_{datetime.date.today().strftime("%Y-%m-%d")}.tar.gz'
+    print("----backup media started----")
+    os.system(
+        f'tar -zcvf /{backup_path}/{backup_file_name} /var/www/beany_blog/media/'
+    )
+    print("----backup media file created----")
+    print("----backup media email sending----")
+    send_email_with_file(
+        f'[Beany 블로그] {datetime.date.today().strftime("%Y-%m-%d")} 미디어 백업',
+        EMAIL_TEMPLATE_MAPPER[BACKUP_MEDIA],
+        {},
+        settings.NOTICE_EMAILS,
+        f'{backup_path}/{backup_file_name}',
+    )
+    print("----backup media email sended----")
+    print("----backup media deleting----")
+    os.system(f'rm -rf /{backup_path}/{backup_file_name}')
+    print("----backup media deleted----")
 
 
 def get_chatgpt_lesson():
