@@ -30,8 +30,10 @@
     font-size: 15px;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-height: 150px;
     height: 150px;
     display: -webkit-box;
+    transition: max-height 0.3s ease-out;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
@@ -40,6 +42,8 @@
 
 .bottom_hidden_text-with-out-overflow {
     font-size: 15px;
+    height: auto; /* 펼쳐질 때 높이를 자동으로 설정 */
+    transition: none; /* jQuery 애니메이션이 적용되므로 transition은 해제 */
 }
 
 #lesson_body pre {
@@ -70,17 +74,30 @@
 {% block script %}
 <script src="{% static 'markedjs_14_1_2.js' %}"></script>
 <script>
-    $(document).ready(function(){
+    $(document).ready(function() {
         const normalText = document.getElementById('lesson_body').innerHTML;
         document.getElementById('lesson_body').innerHTML = marked.parse(normalText);
+
         $('#lesson_detail').on('click', function() {
-            if ($(this).parent().parent().find('p').hasClass('bottom_hidden_text')) {
-                $(this).parent().parent().find('p').removeClass('bottom_hidden_text');
-                $(this).parent().parent().find('p').addClass('bottom_hidden_text-with-out-overflow');
+            const $p = $(this).parent().parent().find('p');
+
+            if ($p.hasClass('bottom_hidden_text')) {
+                $p.removeClass('bottom_hidden_text')
+                    .addClass('bottom_hidden_text-with-out-overflow')
+                    .css('height', 'auto');
+
+                let scrollHeight = $p.get(0).scrollHeight;
+
+                $p.css('height', '150px');
+                $p.stop().animate({ height: scrollHeight + "px" }, 500);
+
                 $(this).text('접기');
             } else {
-                $(this).parent().parent().find('p').removeClass('bottom_hidden_text-with-out-overflow');
-                $(this).parent().parent().find('p').addClass('bottom_hidden_text');
+                $p.stop().animate({ height: "150px" }, 500, function() {
+                    $p.removeClass('bottom_hidden_text-with-out-overflow')
+                        .addClass('bottom_hidden_text');
+                });
+
                 $(this).text('자세히보기');
             }
         });
