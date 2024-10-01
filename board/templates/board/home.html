@@ -7,6 +7,10 @@
     height: 100%;
 }
 
+.card-title {
+    margin-bottom: 15px;
+}
+
 .card_img{
     background-repeat:no-repeat;
     background-position-y:center;
@@ -22,9 +26,28 @@
     -webkit-box-orient: vertical;
 }
 
-.truncate-3-with-out-overflow {
+.bottom_hidden_text {
     font-size: 15px;
-    white-space: break-spaces;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 150px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+.bottom_hidden_text-with-out-overflow {
+    font-size: 15px;
+}
+
+#lesson_body pre {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    overflow-x: auto;
 }
 
 .truncate-5 {
@@ -45,16 +68,19 @@
 {% block img %}https://cwbeany.com/static/logo.ico{% endblock %}
 
 {% block script %}
+<script src="{% static 'markedjs_14_1_2.js' %}"></script>
 <script>
     $(document).ready(function(){
+        const normalText = document.getElementById('lesson_body').innerHTML;
+        document.getElementById('lesson_body').innerHTML = marked.parse(normalText);
         $('#lesson_detail').on('click', function() {
-            if ($(this).parent().parent().find('p').hasClass('truncate-3')) {
-                $(this).parent().parent().find('p').removeClass('truncate-3');
-                $(this).parent().parent().find('p').addClass('truncate-3-with-out-overflow');
+            if ($(this).parent().parent().find('p').hasClass('bottom_hidden_text')) {
+                $(this).parent().parent().find('p').removeClass('bottom_hidden_text');
+                $(this).parent().parent().find('p').addClass('bottom_hidden_text-with-out-overflow');
                 $(this).text('접기');
             } else {
-                $(this).parent().parent().find('p').removeClass('truncate-3-with-out-overflow');
-                $(this).parent().parent().find('p').addClass('truncate-3');
+                $(this).parent().parent().find('p').removeClass('bottom_hidden_text-with-out-overflow');
+                $(this).parent().parent().find('p').addClass('bottom_hidden_text');
                 $(this).text('자세히보기');
             }
         });
@@ -71,7 +97,8 @@
             <div class="col-12">
                 <div class="card-body">
                     <h5 class="card-title">{{ lesson.summary }}</h5>
-                    <p class="card-text truncate-3">{{ lesson.body }}</p>
+                    <p id="lesson_body" class="card-text bottom_hidden_text">{{ lesson.body }}</p>
+                    <div class="fade-out"></div>
                     <div class="card-text text-center">
                         <span id="lesson_detail" style="cursor: pointer;">자세히보기</span>
                     </div>
