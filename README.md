@@ -141,6 +141,13 @@ Project Root
 ![img.png](https://github.com/cwadven/cwbeany/blob/master/docs/erd/erd.png?raw=true)
 
 
+## Django Command
+
+```shell
+python manage.py crontab add
+```
+
+
 ## Celery Command
 
 ```shell
