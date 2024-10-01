@@ -66,6 +66,7 @@ from chatgpt.services import (
     get_latest_post_summary_by_post_id,
     get_lessons,
 )
+from common.common_utils.string_utils import replace_special_char
 from control.dtos.common_dtos import AnnounceInfo
 from control.services import get_announces
 
@@ -161,7 +162,7 @@ def home(request):
             ],
             lesson=HomeLesson(
                 summary=lesson.summary,
-                body=lesson.body,
+                body=replace_special_char(lesson.body),
             ) if lesson else None,
         ).model_dump(),
     )

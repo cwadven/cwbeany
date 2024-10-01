@@ -4,7 +4,9 @@ from ckeditor_uploader.fields import RichTextUploadingField
 import re
 from django.urls import reverse
 
+from board.consts import SPECIAL_CHAR
 from board.managers import PostManager
+from common.common_utils.string_utils import replace_special_char
 
 
 class TimeStampedModel(models.Model):
@@ -94,22 +96,9 @@ class Post(TimeStampedModel):
             self.tag_set.add(tag)
 
     def short_body(self):
-        SPECIAL_CHAR = {
-            '&gt;': '>',
-            '&nbsp;': ' ',
-            '&lt;': '<',
-            '&amp;': '&',
-            '&quot;': '"',
-            '&#39;': "'",
-            '&minus;': '-',
-        }
         split_body_list = self.body.split()[:50]
         result_string = " ".join(split_body_list)
-
-        for key, val in SPECIAL_CHAR.items():
-            result_string = result_string.replace(key, val)
-
-        return result_string
+        return replace_special_char(result_string)
 
     # sitemap 생성하기 위해서 reverse 사용하여 해당 매개변수를 넣기
     def get_absolute_url(self):

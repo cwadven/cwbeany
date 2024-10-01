@@ -76,7 +76,21 @@
 <script>
     $(document).ready(function() {
         const normalText = document.getElementById('lesson_body').innerHTML;
-        document.getElementById('lesson_body').innerHTML = marked.parse(normalText);
+        const replaceList = [
+            {from: /&gt;/g, to: '>'},
+            {from: /&nbsp;/g, to: ' '},
+            {from: /&lt;/g, to: '<'},
+            {from: /&amp;/g, to: '&'},
+            {from: /&quot;/g, to: '"'},
+            {from: /&#39;/g, to: "'"},
+            {from: /&minus;/g, to: '-'},
+        ];
+        let markedText = marked.parse(normalText);
+        for (const replace of replaceList) {
+            markedText = markedText.replace(replace.from, replace.to);
+        }
+        document.getElementById('lesson_body').innerHTML = markedText;
+        
 
         $('#lesson_detail').on('click', function() {
             const $p = $(this).parent().parent().find('p');

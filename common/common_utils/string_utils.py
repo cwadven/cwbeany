@@ -4,6 +4,8 @@ from typing import (
     Union,
 )
 
+from board.consts import SPECIAL_CHAR
+
 
 def get_filtered_by_startswith_text_and_convert_to_standards(startswith_text: str,
                                                              keys: Sequence,
@@ -22,3 +24,9 @@ def get_filtered_by_startswith_text_and_convert_to_standards(startswith_text: st
         int(key.replace(startswith_text, '')) if is_integer else key.replace(startswith_text, '')
         for key in keys if key.startswith(startswith_text)
     ]
+
+
+def replace_special_char(target_string: str) -> str:
+    for key, val in SPECIAL_CHAR.items():
+        target_string = target_string.replace(key, val)
+    return target_string
