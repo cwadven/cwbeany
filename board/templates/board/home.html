@@ -62,6 +62,30 @@
     -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
 }
+
+.profile-description {
+    display: flex;
+    overflow-x: auto;
+    flex-direction: column;
+    white-space: nowrap;
+    padding: 15px;
+    border-radius: 10px;
+    background: #F5F5F5;
+}
+
+.profile-description::-webkit-scrollbar{
+    height: 5px;
+}
+
+.profile-description::-webkit-scrollbar-thumb{
+    background-color: rgb(2, 10, 10);
+    border-radius: 10px;
+}
+
+.profile-description::-webkit-scrollbar-track{
+    background-color: rgba(1, 6, 6, 0.33);
+    border-radius: 10px;
+}
 </style>
 {% endblock %}
 
@@ -128,11 +152,11 @@
 <div class="col-sm-12 col-md-5 col-lg-4 col-xl-4 col-xxl-3">
     <div style="display: flex; flex-direction: column;">
         <div class="profile-image"
-             style="width: 260px; height: 260px; border-radius: 50%; background-image: url('{% static 'logo.ico' %}'); background-size: cover; background-position: center; margin: 15px 0; align-self: center;"></div>
-        <h4>이창우 (Beany)</h4>
+             style="width: 260px; height: 260px; border-radius: 50%; background-image: url('{{ profile_image_url }}'); background-size: cover; background-position: center; margin: 15px 0; align-self: center;"></div>
+        <h4>{{ profile_name }}</h4>
     </div>
     <div class="profile-simple-description">
-        <p>프로젝트 좋아, 코딩 좋아, 만드는 것 자체를 좋아하는 개발자 이창우 입니다~!</p>
+        <p>{{ profile_simple_description }}</p>
     </div>
     <div class="profile-sns">
         <table>
@@ -146,9 +170,9 @@
         <p></p>
     </div>
 </div>
-<div class="col-sm-12 col-md-7 col-lg-8 col-xl-8 col-xxl-9">
+<div class="col-sm-12 col-md-7 col-lg-8 col-xl-8 col-xxl-9" style="margin-bottom: 10px;">
 <div id="profile-description" class="profile-description">
-
+{{ profile_description }}
 </div>
 </div>
 {% endblock %}

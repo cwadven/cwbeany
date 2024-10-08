@@ -52,6 +52,7 @@ THIRD_APPS = [
     'django_crontab',
     'django_celery_results',
     'debug_toolbar',
+    'constance',
 ]
 
 PROJECT_APPS = [
@@ -324,6 +325,27 @@ INTERNAL_IPS = [
 ]
 
 WEB_HOOK_ADDRESS = WEB_HOOK_ADDRESS
+
+
+CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
+CONSTANCE_CONFIG = {
+    'PROFILE_DESCRIPTION_MARKDOWN': (
+        '',
+        '홈 화면에 보이는 자기 소개 MARKDOWN 부분',
+    ),
+    'PROFILE_IMAGE_URL': (
+        '',
+        '홈 화면에 보이는 자기 소개 프로필 사진 URL',
+    ),
+    'PROFILE_NAME': (
+        '',
+        '홈 화면에 보이는 이름',
+    ),
+    'PROFILE_SIMPLE_DESCRIPTION': (
+        '',
+        '홈 화면에 보이는 간단 소개',
+    ),
+}
 
 
 if not DEBUG:

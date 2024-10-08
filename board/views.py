@@ -1,3 +1,4 @@
+from constance import config
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import (
     get_object_or_404,
@@ -164,6 +165,10 @@ def home(request):
                 summary=lesson.summary,
                 body=replace_special_char(lesson.body),
             ) if lesson else None,
+            profile_description=mark_safe(config.PROFILE_DESCRIPTION_MARKDOWN),
+            profile_image_url=config.PROFILE_IMAGE_URL,
+            profile_name=config.PROFILE_NAME,
+            profile_simple_description=config.PROFILE_SIMPLE_DESCRIPTION,
         ).model_dump(),
     )
 

@@ -1,4 +1,5 @@
 from typing import (
+    Any,
     List,
     Optional,
 )
@@ -10,9 +11,15 @@ from pydantic import (
 
 from board.dtos.common_dtos import (
     BoardPost,
-    HomePost,
-    TagInfo, RecentBoardPostLayer, DetailPost, DetailPostSummary, DetailPostNavigation, ImportantUrl, DetailPostTag,
+    DetailPost,
+    DetailPostNavigation,
     DetailPostReply,
+    DetailPostSummary,
+    DetailPostTag,
+    HomePost,
+    ImportantUrl,
+    RecentBoardPostLayer,
+    TagInfo,
 )
 from chatgpt.dtos.common_dtos import HomeLesson
 from control.dtos.common_dtos import AnnounceInfo
@@ -58,6 +65,22 @@ class HomeResponse(BaseModel):
     lesson: Optional[HomeLesson] = Field(
         None,
         description='홈 화면에 표시할 ChatGPT 학습 정보',
+    )
+    profile_description: Optional[Any] = Field(
+        None,
+        description='홈 화면에 Profile 정보 MarkDown',
+    )
+    profile_image_url: Optional[str] = Field(
+        None,
+        description='홈 화면에 Profile 사진 URL',
+    )
+    profile_name: Optional[str] = Field(
+        None,
+        description='홈 화면에 Profile 이름',
+    )
+    profile_simple_description: Optional[str] = Field(
+        None,
+        description='홈 화면에 Profile 간단 소개',
     )
 
 
