@@ -68,6 +68,7 @@ from chatgpt.services import (
     get_lessons,
 )
 from common.common_utils.string_utils import replace_special_char
+from config import settings
 from control.dtos.common_dtos import AnnounceInfo
 from control.services import get_announces
 
@@ -166,7 +167,7 @@ def home(request):
                 body=replace_special_char(lesson.body),
             ) if lesson else None,
             profile_description=mark_safe(config.PROFILE_DESCRIPTION_MARKDOWN),
-            profile_image_url=config.PROFILE_IMAGE_URL,
+            profile_image_url=settings.MEDIA_URL + config.PROFILE_IMAGE_URL,
             profile_name=config.PROFILE_NAME,
             profile_simple_description=config.PROFILE_SIMPLE_DESCRIPTION,
         ).model_dump(),

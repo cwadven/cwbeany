@@ -328,6 +328,12 @@ WEB_HOOK_ADDRESS = WEB_HOOK_ADDRESS
 
 
 CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
+CONSTANCE_FILE_ROOT = 'constance'
+
+CONSTANCE_ADDITIONAL_FIELDS = {
+    'image_field': ['django.forms.ImageField', {}]
+}
+
 CONSTANCE_CONFIG = {
     'PROFILE_DESCRIPTION_MARKDOWN': (
         '',
@@ -336,6 +342,7 @@ CONSTANCE_CONFIG = {
     'PROFILE_IMAGE_URL': (
         '',
         '홈 화면에 보이는 자기 소개 프로필 사진 URL',
+        'image_field',
     ),
     'PROFILE_NAME': (
         '',
