@@ -75,7 +75,6 @@
 <script src="{% static 'markedjs_14_1_2.js' %}"></script>
 <script>
     $(document).ready(function() {
-        const normalText = document.getElementById('lesson_body').innerHTML;
         const replaceList = [
             {from: /&gt;/g, to: '>'},
             {from: /&nbsp;/g, to: ' '},
@@ -85,12 +84,17 @@
             {from: /&#39;/g, to: "'"},
             {from: /&minus;/g, to: '-'},
         ];
-        let markedText = marked.parse(normalText);
+
+        const lessonBodyNormalText = document.getElementById('lesson_body').innerHTML;
+        const profileDescriptionNormalText = document.getElementById('profile-description').innerHTML;
+        let lessonBodyMarkedText = marked.parse(lessonBodyNormalText);
+        let profileDescriptionMarkedText = marked.parse(profileDescriptionNormalText);
         for (const replace of replaceList) {
-            markedText = markedText.replace(replace.from, replace.to);
+            lessonBodyMarkedText = lessonBodyMarkedText.replace(replace.from, replace.to);
+            profileDescriptionMarkedText = profileDescriptionMarkedText.replace(replace.from, replace.to);
         }
-        document.getElementById('lesson_body').innerHTML = markedText;
-        
+        document.getElementById('lesson_body').innerHTML = lessonBodyMarkedText;
+        document.getElementById('profile-description').innerHTML = profileDescriptionMarkedText;
 
         $('#lesson_detail').on('click', function() {
             const $p = $(this).parent().parent().find('p');
@@ -119,9 +123,40 @@
 </script>
 {% endblock %}
 
+
+{% block my_profile %}
+<div class="col-sm-12 col-md-5 col-lg-4 col-xl-4 col-xxl-3">
+    <div style="display: flex; flex-direction: column;">
+        <div class="profile-image"
+             style="width: 260px; height: 260px; border-radius: 50%; background-image: url('{% static 'logo.ico' %}'); background-size: cover; background-position: center; margin: 15px 0; align-self: center;"></div>
+        <h4>이창우 (Beany)</h4>
+    </div>
+    <div class="profile-simple-description">
+        <p>프로젝트 좋아, 코딩 좋아, 만드는 것 자체를 좋아하는 개발자 이창우 입니다~!</p>
+    </div>
+    <div class="profile-sns">
+        <table>
+            <tr>
+                <td><strong>Github</strong></td><td>) <a href="https://github.com/cwadven" target="_blank">https://github.com/cwadven</a></td>
+            </tr>
+            <tr>
+                <td><strong>Email</strong></td><td>) cwadven@naver.com</td>
+            </tr>
+        </table>
+        <p></p>
+    </div>
+</div>
+<div class="col-sm-12 col-md-7 col-lg-8 col-xl-8 col-xxl-9">
+<div id="profile-description" class="profile-description">
+
+</div>
+</div>
+{% endblock %}
+
+
 {% block lesson %}
 {% if lesson %}
-    <h5 class="rounded-top border border-dark bg-light p-2">오늘의 교훈</h5>
+    <h5 class="rounded-top border border-dark bg-light p-2">오늘의 Lesson</h5>
     <div class="col-12">
     <div class="card">
         <div class="row g-0">
