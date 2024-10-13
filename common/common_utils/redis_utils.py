@@ -11,9 +11,10 @@ redis_client = redis.StrictRedis(
 
 
 class RedisQueue:
-    def __init__(self, queue_name: str, ttl: int = None):
+    def __init__(self, queue_name: str, ttl: int = None, max_size: int = None):
         self.queue_name = queue_name
         self.ttl = ttl
+        self.max_size = max_size
 
     def enqueue(self, value: str) -> int:
         """
@@ -23,6 +24,8 @@ class RedisQueue:
             self.queue_name,
             value,
         )
+        if self.max_size and total_count > self.max_size:
+            self.dequeue()
         if self.ttl:
             redis_client.expire(self.queue_name, self.ttl)
         return total_count
