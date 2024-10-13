@@ -10,6 +10,7 @@ from chatgpt.models import (
     LessonInformation,
 )
 from chatgpt.services import get_chatgpt_response
+from common.common_utils.google_utils.google_drive_utils import GoogleDriveServiceGenerator, GoogleDriveService
 from common.common_utils.io_utils import (
     send_email,
     send_email_with_file,
@@ -101,15 +102,30 @@ def media_backup():
         f'tar -zcvf /{backup_path}/{backup_file_name} /var/www/beany_blog/media/'
     )
     print("----backup media file created----")
-    print("----backup media email sending----")
-    send_email_with_file(
-        f'[Beany 블로그] {datetime.date.today().strftime("%Y-%m-%d")} 미디어 백업',
-        EMAIL_TEMPLATE_MAPPER[BACKUP_MEDIA],
-        {},
-        settings.NOTICE_EMAILS,
-        f'{backup_path}/{backup_file_name}',
+    print("----backup media file uploading to google drive----")
+    google_drive_service = GoogleDriveService(
+        service=GoogleDriveServiceGenerator(
+            settings.GOOGLE_SERVICE_ACCOUNT_FILE,
+            settings.GOOGLE_API_SCOPES,
+        ).generate_service()
     )
-    print("----backup media email sended----")
+    file_id = google_drive_service.upload_file_by_file_path(
+        file_name=backup_file_name,
+        upload_target_file_path=f'{backup_path}/{backup_file_name}',
+        upload_drive_folder_target=settings.GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID,
+    )
+    redirect_url = f'https://drive.google.com/file/d/{file_id}/view'
+    print("----backup media file uploaded to google drive----")
+    print("----email notice uploaded to google drive----")
+    send_email(
+        f'[Beany 블로그] {datetime.date.today().strftime("%Y-%m-%d")} 미디어 백업 완료',
+        EMAIL_TEMPLATE_MAPPER[BACKUP_MEDIA],
+        {
+            'redirect_url': redirect_url,
+        },
+        settings.NOTICE_EMAILS,
+    )
+    print("----email sent notice uploaded to google drive----")
     print("----backup media deleting----")
     os.system(f'rm -rf /{backup_path}/{backup_file_name}')
     print("----backup media deleted----")
