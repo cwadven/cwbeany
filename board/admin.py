@@ -70,6 +70,11 @@ class PostAdmin(admin.ModelAdmin):
         '_like_count',
     )
 
+    class Media:
+        js = (
+            'django_admin/temp_save.js',
+        )
+
     def get_queryset(self, request):
         qs = super(PostAdmin, self).get_queryset(request)
         qs = qs.annotate(
