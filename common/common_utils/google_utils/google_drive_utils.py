@@ -40,7 +40,7 @@ class GoogleDriveService:
             'name': file_name,
             'parents': [upload_drive_folder_target]
         }
-        media = MediaIoBaseUpload(upload_target_file_path, mimetype='application/octet-stream')
+        media = MediaFileUpload(upload_target_file_path, mimetype='application/octet-stream')
         file = self.service.files().create(body=file_metadata, media_body=media, fields='id').execute()
         return file.get('id')
 
@@ -49,7 +49,7 @@ class GoogleDriveService:
             'name': file_obj.name,
             'parents': [upload_drive_folder_target]
         }
-        media = MediaFileUpload(file_obj, mimetype='application/octet-stream')
+        media = MediaIoBaseUpload(file_obj, mimetype='application/octet-stream')
         file = self.service.files().create(body=file_metadata, media_body=media, fields='id').execute()
         return file.get('id')
 
