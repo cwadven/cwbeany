@@ -111,7 +111,7 @@ def media_backup():
     )
     file_id = google_drive_service.upload_file_by_file_path(
         file_name=backup_file_name,
-        upload_target_file_path=f'{backup_path}/{backup_file_name}',
+        upload_target_file_path=f'/{backup_path}/{backup_file_name}',
         upload_drive_folder_target=settings.GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID,
     )
     redirect_url = f'https://drive.google.com/file/d/{file_id}/view'
