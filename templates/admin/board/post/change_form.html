@@ -1,0 +1,92 @@
+{% extends "admin/change_form.html" %}
+
+{% block content %}
+    <div id="custom-api-section" style="margin-bottom: 20px;">
+        <h3>임시저장 데이터 가져오기</h3>
+        <button class="default" id="fetch-api-data" type="button" style="
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        ">새로 가져오기
+        </button>
+        <div id="api-result"></div>
+    </div>
+
+    {{ block.super }}  <!-- 기본 Admin 콘텐츠는 아래에 출력 -->
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const fetchButton = document.getElementById('fetch-api-data');
+            const resultDiv = document.getElementById('api-result');
+
+            // Post ID나 queue_name을 가져오는 함수
+            function getQueueName() {
+                const urlParts = window.location.href.split('/');
+                const postId = urlParts[urlParts.length - 3];
+                if (postId === 'post') {
+                    return document.querySelector('#user-tools strong').innerHTML;
+                } else {
+                    return `post_${postId}`;
+                }
+            }
+
+            // API 요청을 보내는 함수
+            function fetchTemporarySaveData(queueName) {
+                const url = `/post/get-temporary-save?queue_name=${queueName}`;
+                resultDiv.innerHTML = '<p>데이터를 가져오는 중입니다...</p>';
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => displayTemporarySaveData(data))
+                    .catch(error => {
+                        resultDiv.innerHTML = `<p>오류 발생: ${error.message}</p>`;
+                    });
+            }
+
+            // 데이터를 화면에 표시하는 함수
+            function displayTemporarySaveData(data) {
+                resultDiv.innerHTML = ''; // 기존 내용을 지움
+
+                if (!data.data || data.data.length === 0) {
+                    resultDiv.innerHTML = '<p>임시 저장 데이터가 없습니다.</p>';
+                    return;
+                }
+
+                data.data.forEach((item, index) => {
+                    const outerDiv = document.createElement('div');
+                    outerDiv.style.marginBottom = '20px';
+
+                    const innerDiv = document.createElement('div');
+                    innerDiv.innerHTML = `<p><strong>임시 저장 데이터 ${index + 1}</strong></p>`;
+
+                    const textarea = document.createElement('textarea');
+                    textarea.style.width = '100%';
+                    textarea.style.height = '200px';
+                    textarea.value = item;
+                    textarea.name = `temp-save-result-${index}`;
+
+                    outerDiv.appendChild(innerDiv);
+                    outerDiv.appendChild(textarea);
+                    resultDiv.appendChild(outerDiv);
+                });
+            }
+
+            // 버튼 클릭 시 API 호출
+            fetchButton.addEventListener('click', function () {
+                const queueName = getQueueName();
+                fetchTemporarySaveData(queueName);
+            });
+        });
+    </script>
+{% endblock %}
