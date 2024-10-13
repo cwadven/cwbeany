@@ -10,6 +10,9 @@ from .PRIVATE_SETTING import (
     WEB_HOOK_ADDRESS,
     SENTRY_DNS,
     GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID,
+    REDIS_HOST,
+    REDIS_PORT,
+    REDIS_DB,
 )
 
 import sentry_sdk
@@ -360,6 +363,10 @@ GOOGLE_API_SCOPES = [
     'https://www.googleapis.com/auth/drive',
 ]
 GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID = GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID
+
+REDIS_HOST = REDIS_HOST
+REDIS_PORT = REDIS_PORT
+REDIS_DB = REDIS_DB
 
 if not DEBUG:
     sentry_sdk.init(
