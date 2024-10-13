@@ -22,7 +22,6 @@ class RedisQueue:
         total_count = redis_client.lpush(
             self.queue_name,
             value,
-            self.ttl,
         )
         if self.ttl:
             redis_client.expire(self.queue_name, self.ttl)
