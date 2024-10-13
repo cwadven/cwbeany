@@ -355,6 +355,9 @@ CONSTANCE_CONFIG = {
 }
 
 GOOGLE_SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'google_service_account_file.json')
+GOOGLE_API_SCOPES = [
+    'https://www.googleapis.com/auth/drive',
+]
 
 if not DEBUG:
     sentry_sdk.init(
