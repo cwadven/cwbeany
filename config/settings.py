@@ -354,6 +354,7 @@ CONSTANCE_CONFIG = {
     ),
 }
 
+GOOGLE_SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'google_service_account_file.json')
 
 if not DEBUG:
     sentry_sdk.init(
