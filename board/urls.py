@@ -15,4 +15,6 @@ urlpatterns = [
     path('<str:board_url>/<int:pk>/rereply_del', rereply_delete, name='rereply_delete'),
     path('<str:board_url>/<int:pk>/like', like, name='like'),
     path('board-group/<int:board_group_id>/constant', get_boards_info_from_board_group, name='get_boards_info_from_board_group'),
+
+    path('post/temporary-save', post_temporary_save, name='post_temporary_save'),
 ]

@@ -7,6 +7,7 @@ from django.shortcuts import (
 from django.http import (
     HttpResponse,
     HttpResponseRedirect,
+    JsonResponse,
 )
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -67,6 +68,7 @@ from chatgpt.services import (
     get_latest_post_summary_by_post_id,
     get_lessons,
 )
+from common.common_utils.redis_utils import RedisQueue
 from common.common_utils.string_utils import replace_special_char
 from config import settings
 from control.dtos.common_dtos import AnnounceInfo
@@ -476,3 +478,17 @@ def like(request, board_url, pk):
         Like.objects.create(author=request.user, post=post)
     update_post_like_count(pk)
     return HttpResponseRedirect(reverse('board:post', args=[board_url, pk]))
+
+
+@login_required(login_url='/')
+def post_temporary_save(request):
+    queue_name = request.POST.get('queue_name')
+    value = request.POST.get('value')
+
+    if not queue_name or not value:
+        return JsonResponse({'message': '"queue_name", "value" is required'}, status=400)
+
+    redis_queue = RedisQueue(queue_name, ttl=60 * 30, max_size=5)
+    if redis_queue.get_last() != value:
+        redis_queue.enqueue(value)
+    return JsonResponse({'message': 'success'}, status=200)
