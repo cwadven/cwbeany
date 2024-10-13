@@ -9,6 +9,7 @@ from .PRIVATE_SETTING import (
     NOTICE_EMAILS,
     WEB_HOOK_ADDRESS,
     SENTRY_DNS,
+    GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID,
 )
 
 import sentry_sdk
@@ -358,6 +359,7 @@ GOOGLE_SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'google_service_account_fil
 GOOGLE_API_SCOPES = [
     'https://www.googleapis.com/auth/drive',
 ]
+GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID = GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID
 
 if not DEBUG:
     sentry_sdk.init(
