@@ -1,3 +1,4 @@
+import json
 from constance import config
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import (
@@ -482,8 +483,9 @@ def like(request, board_url, pk):
 
 @login_required(login_url='/')
 def post_temporary_save(request):
-    queue_name = request.POST.get('queue_name')
-    value = request.POST.get('value')
+    request_data = json.loads(request.body)
+    queue_name = request_data.get('queue_name')
+    value = request_data.get('value')
 
     if not queue_name or not value:
         return JsonResponse({'message': '"queue_name", "value" is required'}, status=400)
