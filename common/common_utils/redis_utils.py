@@ -1,6 +1,6 @@
 import redis
 from django.conf import settings
-
+from typing import Optional
 
 redis_client = redis.StrictRedis(
     host=settings.REDIS_HOST,
@@ -48,3 +48,9 @@ class RedisQueue:
         큐의 모든 데이터를 반환하는 메서드
         """
         return redis_client.lrange(self.queue_name, 0, -1)
+
+    def get_last(self) -> Optional[str]:
+        """
+        큐의 마지막 데이터를 반환하는 메서드
+        """
+        return redis_client.lindex(self.queue_name, 0)
