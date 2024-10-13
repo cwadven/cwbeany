@@ -492,3 +492,13 @@ def post_temporary_save(request):
     if redis_queue.get_last() != value:
         redis_queue.enqueue(value)
     return JsonResponse({'message': 'success'}, status=200)
+
+
+@login_required(login_url='/')
+def get_temporary_save(request):
+    queue_name = request.GET.get('queue_name')
+    if not queue_name:
+        return JsonResponse({'message': '"queue_name" is required'}, status=400)
+
+    redis_queue = RedisQueue(queue_name)
+    return JsonResponse({'data': redis_queue.get_all()}, status=200)

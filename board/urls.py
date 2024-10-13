@@ -17,4 +17,5 @@ urlpatterns = [
     path('board-group/<int:board_group_id>/constant', get_boards_info_from_board_group, name='get_boards_info_from_board_group'),
 
     path('post/temporary-save', post_temporary_save, name='post_temporary_save'),
+    path('post/get-temporary-save', get_temporary_save, name='get_temporary_save'),
 ]
