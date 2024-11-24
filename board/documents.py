@@ -10,6 +10,7 @@ from board.models import Post
 class PostDocument(Document):
     title = fields.TextField(analyzer="korean_analyzer")
     body = fields.TextField(analyzer="korean_analyzer")
+    post_img = fields.KeywordField()
     board = fields.ObjectField(
         properties={
             "url": fields.KeywordField(),
