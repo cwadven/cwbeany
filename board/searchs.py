@@ -1,8 +1,10 @@
 from typing import (
     List,
-    Tuple,
 )
-from elasticsearch_dsl import Q
+from elasticsearch_dsl import (
+    Q,
+    Search,
+)
 from board.documents import PostDocument
 
 
@@ -11,9 +13,7 @@ def search_posts(
         board_urls: List[str] = None,
         tag_names: List[str] = None,
         sort_fields: List[str] = None,
-        page: int = 1,
-        page_size: int = 10,
-) -> Tuple[List, int]:
+) -> Search:
     """
     Elasticsearch에서 게시글 검색 및 Django Paginator와 연동
     """
@@ -53,13 +53,4 @@ def search_posts(
     if filters:
         q = Q("bool", must=[q], filter=filters)
 
-    # Elasticsearch 검색 실행
-    search = PostDocument.search().query(q).sort(*sort_fields)
-    total_count = search.count()  # 전체 문서 개수
-    start = (page - 1) * page_size
-
-    # 페이지네이션 적용된 검색 실행
-    search = search[start:start + page_size]
-    results = search.execute()
-
-    return results, total_count
+    return PostDocument.search().query(q).sort(*sort_fields)
