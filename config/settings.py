@@ -373,9 +373,16 @@ REDIS_DB = REDIS_DB
 
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'https://localhost:9200',
-        'http_auth': (ELASTICSEARCH_USERNAME, ELASTICSEARCH_PASSWORD)
-    }
+        'hosts': [
+            {
+                'host': 'localhost',
+                'port': 9200,
+                'use_ssl': True,
+                'ca_certs': os.path.join(BASE_DIR, 'http_ca.crt'),
+            }
+        ],
+        'http_auth': (ELASTICSEARCH_USERNAME, ELASTICSEARCH_PASSWORD),
+    },
 }
 
 if not DEBUG:

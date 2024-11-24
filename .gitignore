@@ -3,6 +3,7 @@ reated by https://www.toptal.com/developers/gitignore/api/django
 
 PRIVATE_SETTING.py
 .idea
+http_ca.crt
 
 ### Django ###
 *.log
