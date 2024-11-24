@@ -58,3 +58,9 @@ class PostDocument(Document):
             'created_at',
             'updated_at',
         ]
+
+    def prepare_post_img(self, instance):
+        """
+        이미지 URL을 Elasticsearch에 저장
+        """
+        return instance.post_img.url if instance.post_img else None
