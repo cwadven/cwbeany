@@ -15,6 +15,14 @@ class PostDocument(Document):
             "url": fields.KeywordField(),
         }
     )
+    author = fields.ObjectField(
+        enabled=False,  # 색인하지 않음, 조회에서만 사용
+        properties={
+            "id": fields.IntegerField(),
+            "username": fields.KeywordField(),
+            "nickname": fields.KeywordField(),
+        }
+    )
     tag_set = fields.NestedField(
         properties={
             "id": fields.IntegerField(),
