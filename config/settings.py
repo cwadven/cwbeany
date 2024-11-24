@@ -13,6 +13,8 @@ from .PRIVATE_SETTING import (
     REDIS_HOST,
     REDIS_PORT,
     REDIS_DB,
+    ELASTICSEARCH_USERNAME,
+    ELASTICSEARCH_PASSWORD,
 )
 
 import sentry_sdk
@@ -57,6 +59,7 @@ THIRD_APPS = [
     'django_celery_results',
     'debug_toolbar',
     'constance',
+    'django_elasticsearch_dsl',
 ]
 
 PROJECT_APPS = [
@@ -367,6 +370,13 @@ GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID = GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID
 REDIS_HOST = REDIS_HOST
 REDIS_PORT = REDIS_PORT
 REDIS_DB = REDIS_DB
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'https://localhost:9200',
+        'http_auth': (ELASTICSEARCH_USERNAME, ELASTICSEARCH_PASSWORD)
+    }
+}
 
 if not DEBUG:
     sentry_sdk.init(
