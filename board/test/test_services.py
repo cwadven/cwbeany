@@ -19,7 +19,7 @@ from board.models import (
 from board.services import (
     get_active_filtered_posts,
     get_active_posts,
-    get_board_paged_posts,
+    get_board_paged_elastic_posts,
     get_boards_by_board_group_id,
     get_liked_post_ids_by_author_id,
     get_replys_by_post_id,
@@ -591,43 +591,43 @@ class GetBoardPagedPostsTest(TestCase):
         self.active_django_post.tag_set.add(self.python_tag)
         self.active_spring_post.tag_set.add(self.java_tag)
 
-    @patch('board.services.web_paging')
-    @patch('board.services.get_active_filtered_posts')
-    def test_get_board_paged_posts(self,
-                                   mock_get_active_filtered_posts,
-                                   mock_web_paging):
+    @patch('board.services.elasticsearch_paging')
+    @patch('board.services.search_posts')
+    def test_get_board_paged_posts(
+            self,
+            mock_search_posts,
+            mock_elasticsearch_paging,
+    ):
         # Given: Search keyword
         search = 'django'
         # And: Board urls
         board_urls = ['django']
         # And: Tag names
-        tag_names = ['python']
+        tag_ids = [1, 2]
         # And: Page
         page = 1
-        # And: Mock get_active_filtered_posts
-        mock_get_active_filtered_posts.return_value = Post.objects.filter(
-            id=self.active_django_post.id
-        )
 
         # When: Get board paged posts
-        get_board_paged_posts(
+        get_board_paged_elastic_posts(
             search=search,
             board_urls=board_urls,
-            tag_names=tag_names,
+            tag_ids=tag_ids,
             page=page,
         )
 
-        # Then: get_active_filtered_posts and web_paging is called
-        mock_get_active_filtered_posts.assert_called_once_with(
-            search=search,
-            board_urls=board_urls,
-            tag_names=tag_names,
+        # Then: elasticsearch_paging and search_posts is called
+        mock_elasticsearch_paging.assert_called_once_with(
+            mock_search_posts.return_value,
+            page,
+            10,
+            5,
         )
-        called_args, _ = mock_web_paging.call_args
-        self.assertIsInstance(called_args[0], PostQuerySet)
-        self.assertEqual(called_args[1], page)
-        self.assertEqual(called_args[2], 10)
-        self.assertEqual(called_args[3], 5)
+        mock_search_posts.assert_called_once_with(
+            query=search,
+            board_urls=board_urls,
+            tag_ids=tag_ids,
+            sort_fields=['-created_at'],
+        )
 
 
 class RequestN8nWebhookTest(TestCase):

@@ -11,7 +11,7 @@ from board.documents import PostDocument
 def search_posts(
         query: str = None,
         board_urls: List[str] = None,
-        tag_names: List[str] = None,
+        tag_ids: List[int] = None,
         sort_fields: List[str] = None,
 ) -> Search:
     """
@@ -40,12 +40,12 @@ def search_posts(
     if board_urls:
         filters.append(Q("terms", board__url=board_urls))
 
-    if tag_names:
+    if tag_ids:
         filters.append(
             Q(
                 "nested",
                 path="tag_set",
-                query=Q("terms", tag_set__tag_name=tag_names)
+                query=Q("terms", tag_set__id=tag_ids)
             )
         )
 

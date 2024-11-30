@@ -13,7 +13,7 @@ class PostDocument(Document):
     post_img = fields.KeywordField()
     board = fields.ObjectField(
         properties={
-            "url": fields.KeywordField(),
+            "url": fields.TextField(),
         }
     )
     author = fields.ObjectField(
@@ -51,6 +51,7 @@ class PostDocument(Document):
     class Django:
         model = Post  # Django 모델과 연결
         fields = [
+            'id',
             'like_count',
             'reply_count',
             'rereply_count',

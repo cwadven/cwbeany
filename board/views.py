@@ -51,7 +51,7 @@ from board.models import (
 from board.services import (
     get_active_filtered_posts,
     get_active_posts,
-    get_board_paged_posts,
+    get_board_paged_elastic_posts,
     get_boards_by_board_group_id,
     get_liked_post_ids_by_author_id,
     get_tags,
@@ -183,13 +183,13 @@ def get_all_board_posts(request):
     if board_posts_request.search:
         board_detail_display = board_posts_request.search
 
-    paging_data = get_board_paged_posts(
+    paging_data = get_board_paged_elastic_posts(
         search=board_posts_request.search,
         page=request.GET.get('page', 1)
     )
     page_posts = paging_data['page_posts']
-    has_previous = page_posts.has_previous()
-    has_next = page_posts.has_next()
+    has_previous = paging_data['has_previous']
+    has_next = paging_data['has_next']
     return render(
         request,
         'board/all_board_detail.html',
@@ -203,21 +203,21 @@ def get_all_board_posts(request):
                 BoardPost(
                     id=post.id,
                     title=post.title,
-                    short_body=post.short_body(),
+                    short_body=replace_special_char(" ".join(post.body.split()[:50])),
                     board_url=post.board.url,
                     author_nickname=post.author.nickname,
                     created_at=post.created_at.strftime('%Y-%m-%d'),
                     like_count=post.like_count,
-                    reply_count=post.reply_count,
-                    image_url=post.post_img.url if post.post_img else static('logo.ico'),
+                    reply_count=post.reply_count + post.rereply_count,
+                    image_url=post.post_img if post.post_img else static('logo.ico'),
                 ) for post in page_posts
             ],
             has_previous=has_previous,
             has_next=has_next,
-            previous_page_number=page_posts.previous_page_number() if has_previous else None,
-            current_page_number=page_posts.number,
-            next_page_number=page_posts.next_page_number() if has_next else None,
-            last_page_number=page_posts.paginator.num_pages,
+            previous_page_number=paging_data['previous_page_number'] if has_previous else None,
+            current_page_number=paging_data['current_page'],
+            next_page_number=paging_data['next_page_number'] if has_next else None,
+            last_page_number=paging_data['num_pages'],
             page_range=paging_data['page_range'],
         ).model_dump()
     )
@@ -228,14 +228,14 @@ def get_board_posts(request, board_url):
 
     board_posts_request = BoardPostsRequest.of(request)
 
-    paging_data = get_board_paged_posts(
+    paging_data = get_board_paged_elastic_posts(
         search=board_posts_request.search,
         board_urls=[board_url],
         page=request.GET.get('page', 1)
     )
     page_posts = paging_data['page_posts']
-    has_previous = page_posts.has_previous()
-    has_next = page_posts.has_next()
+    has_previous = paging_data['has_previous']
+    has_next = paging_data['has_next']
     return render(
         request,
         'board/board_detail.html',
@@ -254,21 +254,21 @@ def get_board_posts(request, board_url):
                 BoardPost(
                     id=post.id,
                     title=post.title,
-                    short_body=post.short_body(),
+                    short_body=replace_special_char(" ".join(post.body.split()[:50])),
                     board_url=post.board.url,
                     author_nickname=post.author.nickname,
                     created_at=post.created_at.strftime('%Y-%m-%d'),
                     like_count=post.like_count,
-                    reply_count=post.reply_count,
-                    image_url=post.post_img.url if post.post_img else static('logo.ico'),
+                    reply_count=post.reply_count + post.rereply_count,
+                    image_url=post.post_img if post.post_img else static('logo.ico'),
                 ) for post in page_posts
             ],
             has_previous=has_previous,
             has_next=has_next,
-            previous_page_number=page_posts.previous_page_number() if has_previous else None,
-            current_page_number=page_posts.number,
-            next_page_number=page_posts.next_page_number() if has_next else None,
-            last_page_number=page_posts.paginator.num_pages,
+            previous_page_number=paging_data['previous_page_number'] if has_previous else None,
+            current_page_number=paging_data['current_page'],
+            next_page_number=paging_data['next_page_number'] if has_next else None,
+            last_page_number=paging_data['num_pages'],
             page_range=paging_data['page_range'],
         ).model_dump()
     )
@@ -278,14 +278,14 @@ def get_tagged_posts(request, tag_name):
     tagged_posts_request = TaggedPostsRequest.of(request)
     tag = get_object_or_404(Tag, tag_name=tag_name)
 
-    paging_data = get_board_paged_posts(
+    paging_data = get_board_paged_elastic_posts(
         search=tagged_posts_request.search,
-        tag_names=[tag.tag_name],
+        tag_ids=[tag.id],
         page=request.GET.get('page', 1)
     )
     page_posts = paging_data['page_posts']
-    has_previous = page_posts.has_previous()
-    has_next = page_posts.has_next()
+    has_previous = paging_data['has_previous']
+    has_next = paging_data['has_next']
     return render(
         request,
         'board/tagged_board_detail.html',
@@ -299,21 +299,21 @@ def get_tagged_posts(request, tag_name):
                 BoardPost(
                     id=post.id,
                     title=post.title,
-                    short_body=post.short_body(),
+                    short_body=replace_special_char(" ".join(post.body.split()[:50])),
                     board_url=post.board.url,
                     author_nickname=post.author.nickname,
                     created_at=post.created_at.strftime('%Y-%m-%d'),
                     like_count=post.like_count,
-                    reply_count=post.reply_count,
-                    image_url=post.post_img.url if post.post_img else static('logo.ico'),
+                    reply_count=post.reply_count + post.rereply_count,
+                    image_url=post.post_img if post.post_img else static('logo.ico'),
                 ) for post in page_posts
             ],
             has_previous=has_previous,
             has_next=has_next,
-            previous_page_number=page_posts.previous_page_number() if has_previous else None,
-            current_page_number=page_posts.number,
-            next_page_number=page_posts.next_page_number() if has_next else None,
-            last_page_number=page_posts.paginator.num_pages,
+            previous_page_number=paging_data['previous_page_number'] if has_previous else None,
+            current_page_number=paging_data['current_page'],
+            next_page_number=paging_data['next_page_number'] if has_next else None,
+            last_page_number=paging_data['num_pages'],
             page_range=paging_data['page_range'],
         ).model_dump()
     )

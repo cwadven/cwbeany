@@ -41,12 +41,16 @@ def elasticsearch_paging(
     :param post_size: 페이지당 문서 개수
     :param page_num_size: 페이지네이션 번호 개수
     :return: {
-        "page_posts": Elasticsearch 결과 (현재 페이지 데이터),
-        "page_range": 페이지네이션 번호 범위,
-        "has_previous": 이전 페이지 여부,
-        "has_next": 다음 페이지 여부,
-        "total_pages": 총 페이지 수,
-        "total_count": 총 문서 수,
+        "page_posts": Elasticsearch 결과 (현재 페이지 데이터)
+        "page_range": 페이지네이션 번호 범위
+        "has_previous": 이전 페이지 여부
+        "has_next": 다음 페이지 여부
+        "total_pages": 총 페이지 수
+        "total_count": 총 문서 수
+        "previous_page_number": 이전 페이지 번호
+        "next_page_number": 다음 페이지 번호
+        "num_pages": 총 페이지 수
+        "current_page": 현재 페이지 번호
     }
     """
     # 총 문서 수 계산
@@ -70,15 +74,21 @@ def elasticsearch_paging(
     search_query = search_query[start:start + post_size]
     page_posts = search_query.execute()
 
-    # 이전/다음 페이지 여부 계산
+    # 이전/다음 페이지 번호 계산
     has_previous = current_page > 1
     has_next = current_page < total_pages
+    previous_page_number = current_page - 1 if has_previous else None
+    next_page_number = current_page + 1 if has_next else None
 
     return {
         "page_posts": page_posts,
         "page_range": page_range,
         "has_previous": has_previous,
         "has_next": has_next,
+        "previous_page_number": previous_page_number,
+        "next_page_number": next_page_number,
         "total_pages": total_pages,
         "total_count": total_count,
+        "num_pages": total_pages,
+        "current_page": current_page,
     }

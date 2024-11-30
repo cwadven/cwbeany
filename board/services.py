@@ -24,7 +24,8 @@ from board.models import (
     Tag,
     UrlImportant,
 )
-from common.common_utils.paginator_utils import web_paging
+from board.searchs import search_posts
+from common.common_utils.paginator_utils import elasticsearch_paging
 
 
 def get_boards_by_board_group_id(board_group_id: int) -> List[Board]:
@@ -84,16 +85,18 @@ def get_tags_active_post_count(tag_ids: List[int]) -> Dict[int, int]:
     )
 
 
-def get_board_paged_posts(search: str = None, page: Union[int, str] = 1, board_urls: List[str] = None, tag_names: List[str] = None):
-    paging_data = web_paging(
-        get_active_filtered_posts(
-            search=search,
+def get_board_paged_elastic_posts(
+        search: str = None,
+        page: Union[int, str] = 1,
+        board_urls: List[str] = None,
+        tag_ids: List[int] = None,
+):
+    paging_data = elasticsearch_paging(
+        search_posts(
+            query=search,
             board_urls=board_urls,
-            tag_names=tag_names,
-        ).select_related(
-            'author'
-        ).order_by(
-            '-id'
+            tag_ids=tag_ids,
+            sort_fields=['-created_at'],
         ),
         int(page),
         10,
