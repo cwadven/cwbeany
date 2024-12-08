@@ -392,3 +392,5 @@ if not DEBUG:
         profiles_sample_rate=1.0,
         environment='production'
     )
+
+A = 1
