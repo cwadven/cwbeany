@@ -1,0 +1,7 @@
+PATH=/usr/local/bin:/usr/bin:/bin
+MAILTO=""
+0 15 * * * . /tmp/env.sh && cd /app && python manage.py update_yesterday_and_today_visitor >> /app/logs/visitor_update.log 2>&1
+0 15 * * 5 . /tmp/env.sh && cd /app && python manage.py database_backup >> /app/logs/database_backup.log 2>&1
+0 15 * * 5 . /tmp/env.sh && cd /app && python manage.py media_backup >> /app/logs/media_backup.log 2>&1
+0 15 * * * . /tmp/env.sh && cd /app && python manage.py get_chatgpt_lesson >> /app/logs/get_chatgpt_lesson.log 2>&1
+0 0 * * * . /tmp/env.sh && cd /app && python manage.py health_check >> /app/logs/health_check.log 2>&1

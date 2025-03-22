@@ -74,7 +74,7 @@ def database_backup():
         charset='utf8'
     )
 
-    backup_path = '/var/www/backup'
+    backup_path = settings.BACKUP_PATH
     backup_file_name = f'nully_blog_{datetime.date.today().strftime("%Y-%m-%d")}.sql'
     os.system(
         f'mysqldump -h {HOST} -u {USER} -p{PASSWORD} {NAME} > {backup_path}/{backup_file_name}')
@@ -95,11 +95,11 @@ def media_backup():
     """
     미디어 백업
     """
-    backup_path = '/var/www/backup'
+    backup_path = settings.BACKUP_PATH
     backup_file_name = f'cwbeany_blog_media_{datetime.date.today().strftime("%Y-%m-%d")}.tar.gz'
     print("----backup media started----")
     os.system(
-        f'tar -zcvf /{backup_path}/{backup_file_name} /var/www/beany_blog/media/'
+        f'tar -zcvf /{backup_path}/{backup_file_name} /app/media/'
     )
     print("----backup media file created----")
     print("----backup media file uploading to google drive----")

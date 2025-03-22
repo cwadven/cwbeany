@@ -1,37 +1,20 @@
 from pathlib import Path
 import os
-from .PRIVATE_SETTING import (
-    SECRET_KEY,
-    LOCAL_DATABASE,
-    EMAIL_HOST_USER,
-    EMAIL_HOST_PASSWORD,
-    CHATGPT_KEY,
-    NOTICE_EMAILS,
-    WEB_HOOK_ADDRESS,
-    SENTRY_DNS,
-    GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID,
-    REDIS_HOST,
-    REDIS_PORT,
-    REDIS_DB,
-    ELASTICSEARCH_USERNAME,
-    ELASTICSEARCH_PASSWORD,
-)
 
 import sentry_sdk
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = SECRET_KEY
+SECRET_KEY = os.environ.get('SECRET_KEY')
+SERVER_ENV = os.environ.get('SERVER_ENV')
 
-SERVER_ENV = os.environ.setdefault('SERVER_ENV', 'Main')
-
-if SERVER_ENV == 'Local':
+if SERVER_ENV in ['Local', 'k8s']:
     DEBUG = True
     ALLOWED_HOSTS = ["*"]
 else:
-    DEBUG = False
-    ALLOWED_HOSTS = ["cwbeany.com"]
+    DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
+    ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(',')
 
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -191,7 +174,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASES = LOCAL_DATABASE
+DATABASES = {
+    'default': {
+        'ENGINE': os.environ.get('DB_ENGINE'),
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
+    }
+}
+
+BACKUP_PATH = os.environ.get('BACKUP_PATH')
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -206,15 +200,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
-]
-
-CRONJOBS = [
-    # UTC Time 기준, 15시 --> 한국 0시
-    ('0 15 * * *', 'config.cron.update_yesterday_and_today_visitor', '>> /var/www/beany_blog/visitor_update.log'),
-    ('0 15 * * 5', 'config.cron.database_backup', '>> /var/www/beany_blog/database_backup.log'),
-    ('0 15 * * 5', 'config.cron.media_backup', '>> /var/www/beany_blog/media_backup.log'),
-    ('0 15 * * *', 'config.cron.get_chatgpt_lesson', '>> /var/www/beany_blog/get_chatgpt_lesson.log'),
-    ('0 0 * * *', 'config.cron.health_check', '>> /var/www/beany_blog/health_check.log'),
 ]
 
 LANGUAGE_CODE = 'en-us'
@@ -296,10 +281,10 @@ LOGGING = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-EMAIL_HOST_USER = EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
-NOTICE_EMAILS = NOTICE_EMAILS
+NOTICE_EMAILS = [os.environ.get('NOTICE_EMAILS')]
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -307,10 +292,14 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = '587'
 EMAIL_USE_TLS = True
 
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = int(os.environ.get('REDIS_PORT'))
+REDIS_DB = int(os.environ.get('REDIS_DB'))
+
 # CELERY SETTINGS
 timezone = 'Asia/Seoul'
-CELERY_BROKER_URL = 'redis://localhost:6379/1'
-result_backend = 'redis://localhost:6379/1'
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+result_backend = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
 accept_content = ["json"]
 task_serializer = "json"
 result_serializer = "json"
@@ -318,20 +307,20 @@ result_serializer = "json"
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://localhost:6379/1',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
     }
 }
 
-CHATGPT_KEY = CHATGPT_KEY
+CHATGPT_KEY = os.environ.get('CHATGPT_KEY')
 
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-WEB_HOOK_ADDRESS = WEB_HOOK_ADDRESS
+WEB_HOOK_ADDRESS = os.environ.get('WEB_HOOK_ADDRESS')
 
 
 CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
@@ -339,6 +328,12 @@ CONSTANCE_FILE_ROOT = 'constance'
 
 CONSTANCE_ADDITIONAL_FIELDS = {
     'image_field': ['django.forms.ImageField', {}]
+}
+
+CONSTANCE_REDIS_CONNECTION = {
+    'host': REDIS_HOST,
+    'port': REDIS_PORT,
+    'db': REDIS_DB,
 }
 
 CONSTANCE_CONFIG = {
@@ -361,33 +356,35 @@ CONSTANCE_CONFIG = {
     ),
 }
 
-GOOGLE_SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'google_service_account_file.json')
+if SERVER_ENV == 'K8s':
+    # Kubernetes 환경에서는 마운트된 파일 경로 사용
+    GOOGLE_SERVICE_ACCOUNT_FILE = '/app/secrets/google_service_account_file.json'
+else:
+    # 로컬 개발 환경에서는 기존 경로 사용
+    GOOGLE_SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'google_service_account_file.json')
+
 GOOGLE_API_SCOPES = [
     'https://www.googleapis.com/auth/drive',
 ]
-GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID = GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID
-
-REDIS_HOST = REDIS_HOST
-REDIS_PORT = REDIS_PORT
-REDIS_DB = REDIS_DB
+GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID')
 
 ELASTICSEARCH_DSL = {
     'default': {
         'hosts': [
             {
-                'host': 'localhost',
-                'port': 9200,
+                'host': os.environ.get('ELASTICSEARCH_HOST'),
+                'port': os.environ.get('ELASTICSEARCH_PORT'),
                 'use_ssl': True,
                 'ca_certs': os.path.join(BASE_DIR, 'http_ca.crt'),
             }
         ],
-        'http_auth': (ELASTICSEARCH_USERNAME, ELASTICSEARCH_PASSWORD),
+        'http_auth': (os.environ.get('ELASTICSEARCH_USERNAME'), os.environ.get('ELASTICSEARCH_PASSWORD')),
     },
 }
 
 if not DEBUG:
     sentry_sdk.init(
-        dsn=SENTRY_DNS,
+        dsn=os.environ.get('SENTRY_DNS'),
         traces_sample_rate=1.0,
         profiles_sample_rate=1.0,
         environment='production'
