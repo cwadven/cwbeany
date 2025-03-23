@@ -297,12 +297,20 @@ REDIS_PORT = int(os.environ.get('REDIS_PORT'))
 REDIS_DB = int(os.environ.get('REDIS_DB'))
 
 # CELERY SETTINGS
-timezone = 'Asia/Seoul'
-CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
-result_backend = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
-accept_content = ["json"]
-task_serializer = "json"
-result_serializer = "json"
+if SERVER_ENV == 'k8s':
+    timezone = os.environ.get('CELERY_TIMEZONE')
+    CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
+    result_backend = os.environ.get('CELERY_RESULT_BACKEND')
+    accept_content = [os.environ.get('CELERY_ACCEPT_CONTENT')]
+    task_serializer = os.environ.get('CELERY_TASK_SERIALIZER')
+    result_serializer = os.environ.get('CELERY_RESULT_SERIALIZER')
+else:
+    timezone = 'Asia/Seoul'
+    CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+    result_backend = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+    accept_content = ["json"]
+    task_serializer = "json"
+    result_serializer = "json"
 
 CACHES = {
     'default': {
@@ -356,7 +364,7 @@ CONSTANCE_CONFIG = {
     ),
 }
 
-if SERVER_ENV == 'K8s':
+if SERVER_ENV == 'k8s':
     # Kubernetes 환경에서는 마운트된 파일 경로 사용
     GOOGLE_SERVICE_ACCOUNT_FILE = '/app/secrets/google_service_account_file.json'
 else:
@@ -368,19 +376,35 @@ GOOGLE_API_SCOPES = [
 ]
 GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_MEDIA_BACKUP_FOLDER_ID')
 
-ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': [
-            {
-                'host': os.environ.get('ELASTICSEARCH_HOST'),
-                'port': os.environ.get('ELASTICSEARCH_PORT'),
-                'use_ssl': True,
-                'ca_certs': os.path.join(BASE_DIR, 'http_ca.crt'),
-            }
-        ],
-        'http_auth': (os.environ.get('ELASTICSEARCH_USERNAME'), os.environ.get('ELASTICSEARCH_PASSWORD')),
-    },
-}
+if SERVER_ENV == 'k8s':
+    # Kubernetes 환경에서는 마운트된 파일 경로 사용
+    ELASTICSEARCH_DSL = {
+        'default': {
+            'hosts': [
+                {
+                    'host': os.environ.get('ELASTICSEARCH_HOST'),
+                    'port': os.environ.get('ELASTICSEARCH_PORT'),
+                }
+            ],
+            'http_auth': (os.environ.get('ELASTICSEARCH_USERNAME'), os.environ.get('ELASTICSEARCH_PASSWORD')),
+        },
+    }
+else:
+    # 로컬 개발 환경에서는 기존 경로 사용
+    ELASTICSEARCH_CA_CERTS = os.path.join(BASE_DIR, 'http_ca.crt')
+    ELASTICSEARCH_DSL = {
+        'default': {
+            'hosts': [
+                {
+                    'host': os.environ.get('ELASTICSEARCH_HOST'),
+                    'port': os.environ.get('ELASTICSEARCH_PORT'),
+                    'use_ssl': True,
+                    'ca_certs': ELASTICSEARCH_CA_CERTS,
+                }
+            ],
+            'http_auth': (os.environ.get('ELASTICSEARCH_USERNAME'), os.environ.get('ELASTICSEARCH_PASSWORD')),
+        },
+    }
 
 if not DEBUG:
     sentry_sdk.init(
