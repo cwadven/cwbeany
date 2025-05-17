@@ -16,17 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  checkout:
-    runs-on: self-hosted
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ${{ github.ref }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
-
   setup-git:
-    needs: checkout
     runs-on: self-hosted
     steps:
     - name: Set Safe Directory
@@ -38,8 +28,10 @@ jobs:
     runs-on: self-hosted
     steps:
     - name: Pull Branch
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
       run: |
-        cd ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }} && sudo git pull origin ${{ github.ref }}
+        cd ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }} && sudo git checkout ${{ github.ref }} && sudo git pull origin ${{ github.ref }}
 
   update-dependencies:
     needs: pull-code
@@ -47,7 +39,7 @@ jobs:
     steps:
     - name: pip Update
       run: |
-        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && pip install -r ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/requirements.txt
+        cd ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }} && . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && pip install -r ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/requirements.txt
 
   collect-static:
     needs: update-dependencies
@@ -55,7 +47,7 @@ jobs:
     steps:
     - name: Collectstatic
       run: |
-        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && python ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/manage.py collectstatic --noinput
+        cd ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }} && . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && python ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/manage.py collectstatic --noinput
 
   database-migrate:
     needs: collect-static
@@ -63,7 +55,7 @@ jobs:
     steps:
     - name: Database Update
       run: |
-        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && python ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/manage.py migrate --noinput
+        cd ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }} && . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && python ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/manage.py migrate --noinput
 
   restart-cron:
     needs: database-migrate
@@ -71,7 +63,7 @@ jobs:
     steps:
     - name: cronjob restart
       run: |
-        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && python manage.py crontab add
+        cd ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }} && . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && python manage.py crontab add
       continue-on-error: true
 
   restart-celery:
