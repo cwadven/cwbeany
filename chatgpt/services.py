@@ -33,7 +33,7 @@ def get_chatgpt_response(
         url=CHATGPT_URL,
         headers=CHATGPT_HEADERS,
         json={
-            'model': 'gpt-3.5-turbo',
+            'model': 'gpt-4o-mini',
             'messages': messages,
         }
     )
