@@ -71,7 +71,7 @@ jobs:
     steps:
     - name: cronjob restart
       run: |
-        python manage.py crontab add
+        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && python manage.py crontab add
       continue-on-error: true
 
   restart-celery:
