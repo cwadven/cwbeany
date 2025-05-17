@@ -1,0 +1,93 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment-type:
+        type: choice
+        description: 'Which server to deployment type'
+        required: true
+        default: 'production'
+        options:
+          - production
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checkout:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+  setup-git:
+    needs: checkout
+    runs-on: self-hosted
+    steps:
+    - name: Set Safe Directory
+      run: |
+        git config --global --add safe.directory "${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}"
+
+  pull-code:
+    needs: setup-git
+    runs-on: self-hosted
+    steps:
+    - name: Pull Branch
+      run: |
+        cd ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }} && sudo git pull origin ${{ github.ref }}
+
+  update-dependencies:
+    needs: pull-code
+    runs-on: self-hosted
+    steps:
+    - name: pip Update
+      run: |
+        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && pip install -r ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/requirements.txt
+
+  collect-static:
+    needs: update-dependencies
+    runs-on: self-hosted
+    steps:
+    - name: Collectstatic
+      run: |
+        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && python ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/manage.py collectstatic --noinput
+
+  database-migrate:
+    needs: collect-static
+    runs-on: self-hosted
+    steps:
+    - name: Database Update
+      run: |
+        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && python ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/manage.py migrate --noinput
+
+  restart-cron:
+    needs: database-migrate
+    runs-on: self-hosted
+    steps:
+    - name: cronjob restart
+      run: |
+        python manage.py crontab add
+      continue-on-error: true
+
+  restart-celery:
+    needs: restart-cron
+    runs-on: self-hosted
+    steps:
+    - name: celery restart
+      run: |
+        sudo /etc/init.d/celeryd restart
+      continue-on-error: true
+
+  restart-web-server:
+    needs: restart-celery
+    runs-on: self-hosted
+    steps:
+    - name: Restart web server
+      run: |
+        sudo systemctl restart nginx
+        sudo systemctl restart uwsgi
