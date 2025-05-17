@@ -14,8 +14,11 @@ from chatgpt.models import (
 )
 
 
-def get_chatgpt_response(system_prompt: str, prompt: str,
-                         conversation_history: List[ChatGPTConversationEntry] = None) -> str:
+def get_chatgpt_response(
+        system_prompt: str,
+        prompt: str,
+        conversation_history: List[ChatGPTConversationEntry] = None
+) -> str:
     if conversation_history is None:
         conversation_history = []
 
@@ -39,7 +42,7 @@ def get_chatgpt_response(system_prompt: str, prompt: str,
         generated_text = response_json['choices'][0]['message']['content']
         return generated_text.strip()
     else:
-        return ''
+        raise Exception(response.json())
 
 
 def get_lessons() -> QuerySet[Lesson]:

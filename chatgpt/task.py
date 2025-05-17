@@ -39,3 +39,10 @@ def update_post_summary(body: str, post_summary_id: int) -> None:
             {},
             settings.NOTICE_EMAILS,
         )
+    except Exception as e:
+        send_email(
+            f'[Beany 블로그] Update Post Summary Issue Raised - PostSummary id: {post_summary_id}',
+            EMAIL_TEMPLATE_MAPPER[POST_SUMMARY_ISSUE],
+            {"exception_message": str(e)},
+            settings.NOTICE_EMAILS,
+        )
