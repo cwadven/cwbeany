@@ -15,6 +15,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SERVER_ENV: "Main"
+
 jobs:
   setup-git:
     runs-on: self-hosted
