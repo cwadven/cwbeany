@@ -1,0 +1,75 @@
+name: Deploy to GitHub Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment-type:
+        type: choice
+        description: 'Which server to deployment type'
+        required: true
+        default: 'production'
+        options:
+          - production
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SERVER_ENV: "Main"
+
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+  deploy:
+    needs: checkout
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          echo "🚀 Starting deployment process..."
+          
+          echo "📂 Changing to project directory..."
+          cd ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}
+          
+          echo "🔄 Fetching latest changes from git..."
+          git fetch origin
+          
+          echo "🔍 Checking out to ${{ github.ref }}..."
+          git checkout ${{ github.ref }}
+          
+          echo "⬇️ Pulling latest changes..."
+          git pull origin ${{ github.ref }}
+          
+          echo "🐍 Activating virtual environment..."
+          . venv/bin/activate
+          
+          echo "📦 Installing/updating dependencies..."
+          pip install -r requirements.txt
+          
+          echo "📝 Collecting static files..."
+          python manage.py collectstatic --noinput
+          
+          echo "🗃️ Running database migrations..."
+          python manage.py migrate --noinput
+          
+          echo "📅 Installing cron jobs..."
+          python manage.py crontab add
+          
+          echo "🌐 Restarting web servers..."
+          sudo systemctl restart nginx
+          sudo systemctl restart gunicorn
+          
+          echo "✅ Deployment completed successfully!"
