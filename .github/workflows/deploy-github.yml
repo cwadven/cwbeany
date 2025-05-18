@@ -70,6 +70,6 @@ jobs:
           
           echo "🌐 Restarting web servers..."
           sudo systemctl restart nginx
-          sudo systemctl restart gunicorn
+          sudo systemctl restart uwsgi
           
           echo "✅ Deployment completed successfully!"
