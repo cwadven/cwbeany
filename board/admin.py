@@ -119,6 +119,29 @@ class PostAdmin(admin.ModelAdmin):
     _like_count.admin_order_field = '_like_count'
 
 
+@admin.register(Reply)
+class ReplyAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'post_id',
+        'body',
+        'created_at',
+        'updated_at',
+    )
+
+
+@admin.register(Rereply)
+class RereplyAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'post_id',
+        'reply_id',
+        'body',
+        'created_at',
+        'updated_at',
+    )
+
+
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = (
